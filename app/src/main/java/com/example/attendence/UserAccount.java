@@ -9,7 +9,7 @@ public class UserAccount {
     public UserAccount() {}
 
     // 매개변수 생성자
-    public UserAccount(String userId, String userName,String pwd) {
+    public UserAccount(String userName, String userId,String pwd) {
         this.userName = userName;
         this.userId = userId;
         this.pwd = pwd;

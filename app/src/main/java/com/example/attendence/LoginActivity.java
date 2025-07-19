@@ -61,7 +61,12 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        db.collection("users").document(userId)
+        String userType = userId.startsWith("p") ? "professors" : "students";
+
+        db.collection("users")
+                .document(userType)
+                .collection("userList")
+                .document(userId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
