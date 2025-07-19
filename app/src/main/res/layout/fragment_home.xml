@@ -7,6 +7,20 @@
     tools:context=".ui.Home.Home">
 
     <TextView
+        android:id="@+id/todayDateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="날짜 불러오는 중..."
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.175"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:textColor="@color/black"
         android:text="@string/title_home"
         android:id="@+id/text_home"

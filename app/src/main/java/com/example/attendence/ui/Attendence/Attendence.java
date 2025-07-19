@@ -10,7 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import com.example.attendence.databinding.FragmentHomeBinding;
+
 
 public class Attendence extends Fragment {
 
@@ -26,6 +31,10 @@ public class Attendence extends Fragment {
 
         final TextView textView = binding.textHome;
         homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+
+        String today = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN).format(new Date());
+        binding.todayDateTextView.setText(today);
+
         return root;
     }
 
