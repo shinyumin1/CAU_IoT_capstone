@@ -33,9 +33,6 @@ public class Info extends Fragment {
         binding = FragmentInfoBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textInfo;
-        notificationsViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-
         binding.logoutButton.setOnClickListener(v->handleLogout());
         return root;
     }
