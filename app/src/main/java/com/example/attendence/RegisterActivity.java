@@ -64,11 +64,8 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        String userType = userId.startsWith("p") ? "professors" : "students";
 
         db.collection("users")
-                .document(userType)
-                .collection("userList")
                 .document(userId)
                 .get()
                 .addOnCompleteListener(task -> {
@@ -80,8 +77,6 @@ public class RegisterActivity extends AppCompatActivity {
                         } else {
                             UserAccount newUser = new UserAccount(userName,userId, pwd);
                             db.collection("users")
-                                    .document(userType)
-                                    .collection("userList")
                                     .document(userId)
                                     .set(newUser)
                                     .addOnSuccessListener(aVoid -> {
@@ -107,13 +102,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     // 자동 로그인 메서드 추가
     private void loginUser(String userId, String userPw) {
-        String userType = userId.startsWith("p") ? "professors" : "students";
         Log.d("RegisterActivity", "자동 로그인 시도: userId=" + userId);
 
         // Firestore에서 사용자 정보 확인
         db.collection("users")
-                .document(userType)
-                .collection("userList")
                 .document(userId)
                 .get()
                 .addOnCompleteListener(task -> {
