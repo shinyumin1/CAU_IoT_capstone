@@ -49,7 +49,7 @@ public class Home extends Fragment {
 
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new TakePostAdapter(getContext(), takeList);
+        adapter = new TakePostAdapter(getContext(), takeList, false);
         recyclerView.setAdapter(adapter);
 
         // 파이어베이스에서 take 데이터 불러오기
@@ -57,31 +57,28 @@ public class Home extends Fragment {
         String userId = getUserIdFromPrefs();
 
         db.collection("users")
-                .document("students")
-                .collection("userList")
                 .document(userId)
-                .collection("takes")
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    Log.d("Home", "총 " + queryDocumentSnapshots.size() + "개의 과목이 있음");
-                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        String subject = doc.getString("과목명");
-                        String professor = doc.getString("교수명");
-                        String classroom = doc.getString("강의실");
-                        String schedule = doc.getString("시간");
-
-                        if (classroom != "null") {
-                            Log.d("Home", "과목: " + subject + ", 교수: " + professor + ", 강의실: " + classroom+", 시간 : "+schedule);
-                            takeList.add(new TakePost(subject, professor, classroom,schedule));
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String role = documentSnapshot.getString("role");
+                        if ("student".equals(role)) {
+                            adapter = new TakePostAdapter(getContext(), takeList, true);
+                            recyclerView.setAdapter(adapter);
+                            loadStudentHome(userId);  // 학생용 데이터 불러오기
+                        } else if ("professor".equals(role)) {
+                            adapter = new TakePostAdapter(getContext(), takeList, false);
+                            recyclerView.setAdapter(adapter);
+                            loadProfessorHome(userId); // 교수용 데이터 불러오기
                         } else {
-                            Log.d("Home", "강의실 정보 없음, 과목: " + subject);
+                            Log.e("Home", "알 수 없는 역할: " + role);
                         }
+                    } else {
+                        Log.e("Home", "해당 사용자 문서 없음");
                     }
-                    adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Home", "데이터 불러오기 실패: ", e);
-
+                    Log.e("Home", "사용자 role 가져오기 실패: ", e);
                 });
 
         return root;
@@ -96,4 +93,52 @@ public class Home extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    private void loadStudentHome(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users")
+                .document(userId)
+                .collection("takes")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    takeList.clear();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        String subject = doc.getString("과목명");
+                        String professor = doc.getString("교수명");
+                        String classroom = doc.getString("강의실");
+                        String schedule = doc.getString("시간");
+
+                        if (classroom != null && !"null".equals(classroom)) {
+                            takeList.add(new TakePost(subject, professor, classroom, schedule));
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Home", "학생 데이터 불러오기 실패: ", e);
+                });
+    }
+
+    private void loadProfessorHome(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users")
+                .document(userId)
+                .collection("lecture")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    takeList.clear();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        String subject = doc.getString("과목명");
+                        String classroom = doc.getString("강의실");
+                        String schedule = doc.getString("시간");
+
+                        takeList.add(new TakePost(subject, " ", classroom, schedule));
+                    }
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Home", "교수 데이터 불러오기 실패: ", e);
+                });
+    }
+
 }

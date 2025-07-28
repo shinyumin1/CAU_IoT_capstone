@@ -7,41 +7,98 @@
     tools:context=".ui.Info.Info">
 
 
-    <TextView
+    <LinearLayout
         android:id="@+id/my_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="내 정보 들어가는 칸"
-        android:textColor="@color/black"
-        android:textSize="30dp"
-        tools:layout_editor_absoluteX="83dp"
-        tools:layout_editor_absoluteY="158dp" />
+        android:orientation="vertical"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/tv_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="이름 : "
+            android:textSize="18sp"
+            android:textColor="#222222" />
+
+        <TextView
+            android:id="@+id/tv_user_dept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="학과/학부 : "
+            android:textSize="18sp"
+            android:textColor="#222222"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/tv_user_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="학번 : "
+            android:textSize="18sp"
+            android:textColor="#222222"
+            android:layout_marginTop="8dp" />
+        <TextView
+            android:id="@+id/tv_user_gender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="성별 : "
+            android:textSize="18sp"
+            android:textColor="#222222"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/tv_user_weight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="체중 : "
+            android:textSize="18sp"
+            android:textColor="#222222"
+            android:layout_marginTop="8dp" />
+
+
+    </LinearLayout>
+
 
     <View
         android:id="@+id/blue_bar"
         android:layout_width="380dp"
         android:layout_height="5dp"
-        android:layout_marginTop="28dp"
         android:background="@color/blue"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.516"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/my_info"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="30dp"
         />
 
-
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_take_posts"
+        android:layout_width="wrap_content"
+        android:layout_height="350dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.053"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/blue_bar"
+        app:layout_constraintVertical_bias="0.002" />
 
     <Button
         android:id="@+id/logout_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
         android:background="@drawable/blue_box"
         android:gravity="center"
         android:text="로그아웃"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rv_take_posts"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

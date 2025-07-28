@@ -53,11 +53,7 @@ public class MainActivity extends AppCompatActivity {
         userNameTextView = findViewById(R.id.my_name);
 
         if (userId != null) {
-            String userType = userId.startsWith("p") ? "professors" : "students";
-
             db.collection("users")
-                    .document(userType)
-                    .collection("userList")
                     .document(userId)
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
@@ -74,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.w(TAG, "userId가 SharedPreferences에 없습니다.");
         }
-
 
         // NavController 가져오기
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
