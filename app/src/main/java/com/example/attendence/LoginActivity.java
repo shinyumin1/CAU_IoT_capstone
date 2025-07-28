@@ -61,11 +61,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        String userType = userId.startsWith("p") ? "professors" : "students";
-
         db.collection("users")
-                .document(userType)
-                .collection("userList")
                 .document(userId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
