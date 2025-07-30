@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".appealS">
+
+    <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="48dp"
+        android:layout_gravity="start|top"
+        android:background="@drawable/profile"
+        android:clickable="true"
+        android:contentDescription="Profile Image"
+        android:focusable="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/profile"/>
+    <LinearLayout
+        android:id="@+id/nameLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="48dp"
+        android:background="@drawable/name_gray"
+        android:layout_gravity="center|top"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="15dp">
+
+        <TextView
+            android:id="@+id/my_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  "
+            android:textColor="@color/black"
+            android:textSize="32dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+    <View
+        android:id="@+id/blue_bar"
+        android:layout_width="380dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="150dp"
+        android:background="@color/blue"
+        android:layout_gravity="center_horizontal" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="170dp"
+        android:layout_gravity="top|start">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2025년 7월 25일 수요일"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/uil_calender"
+            android:layout_marginTop="-5.5dp"
+            android:layout_marginLeft="10dp"/>
+    </LinearLayout>
+    <!--리사이클러뷰-->
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="225dp"
+        android:background="@drawable/gray_box_takes"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/tv_subject"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="과목명"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:id="@+id/tv_professor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="교수명"
+                    android:textSize="18dp"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/tv_classroom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="강의실"
+                android:textSize="16sp"/>
+            <TextView
+                android:id="@+id/tv_schedule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="시간표"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/attend_status_appeal"
+            android:layout_width="125dp"
+            android:layout_height="65dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/blue_box_small"
+            android:text="지각"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+    <!--버튼 클릭하면 나타나도록 -->
+    <LinearLayout
+        android:id="@+id/student_appeal_editbox"
+        android:layout_width="346dp"
+        android:layout_height="130dp"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="160dp"
+        android:background="@drawable/appeal_box"
+        android:padding="12dp">
+
+        <EditText
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:hint="이의 신청할 과목을 선책한 후, 사유를 작성해주세요.(100자 내외)"
+            android:textSize="14.7sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/student_appeal_button"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:text="이의 신청 완료"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="80dp"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:background="@drawable/blue_box"/>
+
+</FrameLayout>
