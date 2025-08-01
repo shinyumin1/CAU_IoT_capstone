@@ -51,13 +51,35 @@ public class MainActivity extends AppCompatActivity {
         String userId = sharedPreferences.getString(KEY_USER_ID, null);
 
         userNameTextView = findViewById(R.id.my_name);
+        // NavController 가져오기
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.nav_host_fragment_activity_main);
 
+        if (navHostFragment == null) {
+            Log.e("MainActivity", "navHostFragment is NULL");
+            return;
+        }
+
+        NavController navController = navHostFragment.getNavController();
         if (userId != null) {
             db.collection("users")
                     .document(userId)
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
+                            //role로 분기
+                            String role = documentSnapshot.getString("role");
+                            binding.getRoot().post(() -> {
+                                if("student".equals(role)) {
+                                    navController.navigate(R.id.navigation_attendence_s);
+                                }
+                                else if("professor".equals(role)) {
+                                    navController.navigate(R.id.navigation_attendence_p);
+                                }else {
+                                    Log.e(TAG, "Unknown role" + role);
+                                }
+
+                            });
                             String userName = documentSnapshot.getString("userName");
                             if (userName != null && userNameTextView != null) {
                                 userNameTextView.setText(userName);
@@ -71,16 +93,7 @@ public class MainActivity extends AppCompatActivity {
             Log.w(TAG, "userId가 SharedPreferences에 없습니다.");
         }
 
-        // NavController 가져오기
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.nav_host_fragment_activity_main);
 
-        if (navHostFragment == null) {
-            Log.e("MainActivity", "navHostFragment is NULL");
-            return;
-        }
-
-        NavController navController = navHostFragment.getNavController();
 
         // AppBarConfiguration 설정
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
