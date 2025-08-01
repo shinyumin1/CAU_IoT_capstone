@@ -61,7 +61,8 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        db.collection("users").document(userId)
+        db.collection("users")
+                .document(userId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {

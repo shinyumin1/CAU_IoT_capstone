@@ -21,7 +21,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
-    private EditText register_id, register_pw1, register_pw2;
+    private EditText register_name,register_id, register_pw1, register_pw2;
     private Button btn_signup;
 
     @Override
@@ -34,6 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
+        register_name=findViewById(R.id.input_name);
         register_id = findViewById(R.id.input_id);
         register_pw1 = findViewById(R.id.input_password);
         register_pw2 = findViewById(R.id.reinput_password);
@@ -46,11 +47,12 @@ public class RegisterActivity extends AppCompatActivity {
     private void registerUser() {
         Log.d("RegisterActivity", "registerUser 메서드 시작");
 
+        String userName = register_name.getText().toString().trim();
         String userId = register_id.getText().toString().trim();
         String pwd = register_pw1.getText().toString().trim();
         String confirmPwd = register_pw2.getText().toString().trim();
 
-        if (userId.isEmpty() || pwd.isEmpty() || confirmPwd.isEmpty()) {
+        if (userName.isEmpty() || userId.isEmpty() || pwd.isEmpty() || confirmPwd.isEmpty()) {
             Log.d("RegisterActivity", "입력값 누락");
             Toast.makeText(this, "모든 필드를 입력하세요.", Toast.LENGTH_SHORT).show();
             return;
@@ -62,7 +64,10 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        db.collection("users").document(userId).get()
+
+        db.collection("users")
+                .document(userId)
+                .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
@@ -70,12 +75,17 @@ public class RegisterActivity extends AppCompatActivity {
                             Log.d("RegisterActivity", "이미 존재하는 사용자 ID입니다.");
                             Toast.makeText(RegisterActivity.this, "이미 존재하는 사용자 ID입니다.", Toast.LENGTH_SHORT).show();
                         } else {
-                            UserAccount newUser = new UserAccount(userId, userId, pwd);
-                            db.collection("users").document(userId).set(newUser)
+                            UserAccount newUser = new UserAccount(userName,userId, pwd);
+                            db.collection("users")
+                                    .document(userId)
+                                    .set(newUser)
                                     .addOnSuccessListener(aVoid -> {
                                         Log.d("RegisterActivity", "회원가입 성공");
                                         Toast.makeText(RegisterActivity.this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
-                                        loginUser(userId, pwd);
+                                        //loginUser(userId, pwd);
+                                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                        startActivity(intent);
+                                        finish();
                                     })
                                     .addOnFailureListener(e -> {
                                         Log.e("RegisterActivity", "회원가입 실패", e);
@@ -95,7 +105,9 @@ public class RegisterActivity extends AppCompatActivity {
         Log.d("RegisterActivity", "자동 로그인 시도: userId=" + userId);
 
         // Firestore에서 사용자 정보 확인
-        db.collection("users").document(userId).get()
+        db.collection("users")
+                .document(userId)
+                .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();

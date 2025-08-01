@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".appealS">
+
+    <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="48dp"
+        android:layout_gravity="start|top"
+        android:background="@drawable/profile"
+        android:clickable="true"
+        android:contentDescription="Profile Image"
+        android:focusable="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/profile"/>
+    <LinearLayout
+        android:id="@+id/nameLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="48dp"
+        android:background="@drawable/name_gray"
+        android:layout_gravity="center|top"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="15dp">
+
+        <TextView
+            android:id="@+id/my_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  "
+            android:textColor="@color/black"
+            android:textSize="32sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+    <View
+        android:id="@+id/blue_bar"
+        android:layout_width="380dp"
+        android:layout_height="5dp"
+        android:layout_marginTop="150dp"
+        android:background="@color/blue"
+        android:layout_gravity="center_horizontal" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="165dp"
+        android:layout_gravity="top|start">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="결석: 0~40%"
+            android:textStyle="bold"
+            android:textSize="12sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="지각: 41~70%"
+            android:textStyle="bold"
+            android:textSize="12sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="지각: 41~70%"
+            android:textStyle="bold"
+            android:textSize="12sp"/>
+    </LinearLayout>
+    <!--리사이클러뷰-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="230dp"
+        android:background="@drawable/gray_box_takes"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tv_student"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="학생이름"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/tv_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="과목명"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/tv_schedule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="시간표"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                />
+            <TextView
+                android:id="@+id/tv_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="2025년 6월 25일"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/attend_status_appeal"
+            android:layout_width="130dp"
+            android:layout_height="75dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/blue_box_small"
+            android:text="30%"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+
+
+    <Button
+        android:id="@+id/student_status_button"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:text="출결 상태 변경하기"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="80dp"
+        android:background="@drawable/blue_box"/>
+
+</FrameLayout>

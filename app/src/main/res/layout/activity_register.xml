@@ -42,12 +42,38 @@
                     android:focusable="true"
                     android:orientation="vertical">
 
+
+                    <EditText
+                        android:id="@+id/input_name"
+                        android:layout_width="match_parent"
+                        android:layout_weight="0.9"
+                        android:layout_height="wrap_content"
+                        android:hint=" 이름을 입력하세요"
+                        android:background="@null"
+                        android:textSize="15dp"
+                        android:gravity="center_vertical"
+                        android:textColorHint="@color/black"
+                        android:textStyle="bold"
+                        android:inputType="text"
+                        android:padding="10dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:background="@drawable/blue_box_empty"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="vertical">
+
+
                     <EditText
                         android:id="@+id/input_id"
                         android:layout_width="match_parent"
                         android:layout_weight="0.9"
                         android:layout_height="wrap_content"
-                        android:hint="아이디를 입력하세요"
+                        android:hint=" 학번을 입력하세요"
                         android:background="@null"
                         android:textSize="15dp"
                         android:gravity="center_vertical"
@@ -68,7 +94,7 @@
                         android:id="@+id/input_password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="비밀번호를 입력하세요"
+                        android:hint=" 비밀번호를 입력하세요"
                         android:background="@null"
                         android:textColorHint="@color/black"
                         android:textSize="15dp"
@@ -88,7 +114,7 @@
                         android:id="@+id/reinput_password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="비밀번호를 다시 입력하세요"
+                        android:hint=" 비밀번호를 다시 입력하세요"
                         android:background="@null"
                         android:textColorHint="@color/black"
                         android:textSize="15dp"

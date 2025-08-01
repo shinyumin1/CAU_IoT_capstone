@@ -36,7 +36,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
@@ -51,4 +50,5 @@ dependencies {
 
     implementation("com.google.firebase:firebase-firestore:25.0.0")
     implementation("com.google.firebase:firebase-analytics:22.0.0")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
 }
