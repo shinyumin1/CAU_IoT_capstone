@@ -5,8 +5,6 @@
     android:layout_height="match_parent"
     tools:context=".appealS">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -35,61 +33,121 @@
     </LinearLayout>
     <!--리사이클러뷰-->
     <LinearLayout
+        android:id="@+id/student_appeal_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="85dp"
         android:background="@drawable/gray_box_takes"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="10dp">
-
         <LinearLayout
-            android:layout_width="200dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tv_student"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="학생이름"
-                android:textSize="18sp"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/tv_subject"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="과목명"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/tv_schedule"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="시간표"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                />
-            <TextView
-                android:id="@+id/tv_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-                android:text="2025년 6월 25일"
-                android:textSize="14sp"
-                android:textStyle="bold"/>
+            <LinearLayout
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tv_student"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="학생이름"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:id="@+id/tv_subject"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="과목명"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+                <TextView
+                    android:id="@+id/tv_schedule"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="시간표"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    />
+                <TextView
+                    android:id="@+id/tv_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2025년 6월 25일"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/attend_status_appeal"
+                android:layout_width="130dp"
+                android:layout_height="75dp"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/blue_box_small"
+                android:text="30%"
+                android:textSize="20sp"
+                android:textStyle="bold" />
         </LinearLayout>
+        <TextView
+            android:id="@+id/reason_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/ex_reason"
+            android:gravity="center"
+            android:visibility="gone"/>
+    </LinearLayout>
 
-        <Button
-            android:id="@+id/attend_status_appeal"
+    <!--android:visibility="gone"-->
+
+    <LinearLayout
+        android:id="@+id/appeal_options"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="175dp"
+        android:layout_marginEnd="30dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/option1"
             android:layout_width="130dp"
             android:layout_height="75dp"
-            android:layout_gravity="center_vertical"
             android:background="@drawable/blue_box_small"
-            android:text="30%"
+            android:gravity="center"
+            android:text="출석"
+            android:textColor="@color/white"
             android:textSize="20sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/option2"
+            android:layout_width="130dp"
+            android:layout_height="75dp"
+            android:background="@drawable/blue_box_small"
+            android:gravity="center"
+            android:text="지각"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/option3"
+            android:layout_width="130dp"
+            android:layout_height="75dp"
+            android:background="@drawable/blue_box_small"
+            android:gravity="center"
+            android:text="결석"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <Button

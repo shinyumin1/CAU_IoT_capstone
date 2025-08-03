@@ -27,6 +27,16 @@
             android:background="@drawable/uil_calender"
             android:layout_marginTop="-5.5dp"
             android:layout_marginLeft="10dp"/>
+
+        <Button
+            android:layout_width="130dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/attend_appeal_blue_box"
+            android:text="출결 이의 신청"
+            android:textSize="13dp"
+
+            android:textStyle="bold" />
     </LinearLayout>
     <!--리사이클러뷰-->
     <LinearLayout
@@ -35,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="80dp"
         android:background="@drawable/gray_box_takes"
         android:orientation="horizontal"
         android:padding="10dp">
@@ -45,10 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:orientation="vertical">
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+
                 <TextView
                     android:id="@+id/tv_subject"
                     android:layout_width="wrap_content"
@@ -56,20 +63,12 @@
                     android:text="과목명"
                     android:textSize="18sp"
                     android:textStyle="bold"/>
-                <TextView
-                    android:id="@+id/tv_professor"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="교수명"
-                    android:textSize="18dp"/>
-            </LinearLayout>
             <TextView
                 android:id="@+id/tv_classroom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="강의실"
+                android:text="교수명"
                 android:textSize="16sp"/>
             <TextView
                 android:id="@+id/tv_schedule"
@@ -99,7 +98,8 @@
         android:layout_gravity="center|bottom"
         android:layout_marginBottom="140dp"
         android:background="@drawable/appeal_box"
-        android:padding="12dp">
+        android:padding="12dp"
+        android:visibility="gone">
 
         <EditText
 
