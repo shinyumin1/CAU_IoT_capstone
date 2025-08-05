@@ -39,57 +39,15 @@
             android:textStyle="bold" />
     </LinearLayout>
     <!--리사이클러뷰-->
-    <LinearLayout
-
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="80dp"
-        android:background="@drawable/gray_box_takes"
-        android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="10dp"/>
 
-        <LinearLayout
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_subject"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="과목명"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
-            <TextView
-                android:id="@+id/tv_classroom"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="교수명"
-                android:textSize="16sp"/>
-            <TextView
-                android:id="@+id/tv_schedule"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="시간표"
-                android:textSize="16sp"/>
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/attend_status_appeal"
-            android:layout_width="125dp"
-            android:layout_height="65dp"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/blue_box_small"
-            android:text="지각"
-            android:textSize="20sp"
-            android:textStyle="bold"/>
-    </LinearLayout>
     <!--버튼 클릭하면 나타나도록 -->
     <LinearLayout
         android:id="@+id/student_appeal_editbox"

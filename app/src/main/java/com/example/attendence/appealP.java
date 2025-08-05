@@ -1,11 +1,15 @@
 package com.example.attendence;
 
 import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.widget.LinearLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,13 +18,26 @@ import android.widget.Button;
 import android.widget.Toast;
 import android.widget.TextView;
 
+import com.example.attendence.databinding.FragmentAppealPBinding;
+import com.google.firebase.Firebase;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link appealP#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class appealP extends Fragment {
-
+    private FragmentAppealPBinding binding;
+    private FirebaseFirestore db;
+    private FirebaseStorage storage;
+    private StorageReference storageRef;
+    private SharedPreferences sharedPreferences;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -109,6 +126,28 @@ public class appealP extends Fragment {
             }
         });
     }
+    private RecyclerView recyclerView;
+    private TakePostAdapter adapter;
+    private List<TakePost> takePostList;
+    // 파이어베이스 데리터 로드
+    //private DatabaseReference databaseReference;
+    @NonNull
+    public View Oncreate(@NonNull LayoutInflater inflater,
+                         @Nullable ViewGroup contatiner,
+                         @Nullable Bundle saveInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_appeal_p, contatiner, false);
 
+        recyclerView = view.findViewById(R.id.recyclerView_p);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        takePostList = new ArrayList<>();
+        //어댑터 연결
+        //adapter = new TakePostAdapter(List<TakePost>)
+        recyclerView.setAdapter(adapter);
+
+        //databaseReference = FirebaseStorage.getInstance().getReference("attendence");
+        //loadDataFromFireBase();
+        return  view;
+    }
 
 }
