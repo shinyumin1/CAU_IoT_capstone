@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.example.attendence.databinding.FragmentAppealPBinding;
 import com.google.firebase.Firebase;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -34,7 +35,6 @@ import java.util.List;
  */
 public class appealP extends Fragment {
     private FragmentAppealPBinding binding;
-    private FirebaseFirestore db;
     private FirebaseStorage storage;
     private StorageReference storageRef;
     private SharedPreferences sharedPreferences;
@@ -50,16 +50,11 @@ public class appealP extends Fragment {
     public appealP() {
         // Required empty public constructor
     }
+    private FirebaseFirestore db;
+    private  RecyclerView recyclerView;
+    private TakePostAdapter adapter;
+    private List<TakePost> takePostList;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment dental_p.
-     */
-    // TODO: Rename and change types and number of parameters
     public static appealP newInstance(String param1, String param2) {
         appealP fragment = new appealP();
         Bundle args = new Bundle();
@@ -72,25 +67,50 @@ public class appealP extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
+    }
+     // db를 통해서 takePost, takePostAdapter 를 이용해 리사이클러뷰 띄위기
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    @Nullable
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_appeal_p, container, false);
+
+        recyclerView = view.findViewById(R.id.recyclerView_p);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        takePostList = new ArrayList<>();
+        adapter = new TakePostAdapter(getContext(), takePostList, true);
+        recyclerView.setAdapter(adapter);
+        db = FirebaseFirestore.getInstance();
+        loadDataFromFirestore();
+
         Button button_attend_p = view.findViewById(R.id.student_status_button);
         button_attend_p.setOnClickListener(v -> {
             Toast.makeText(getContext(), "출결 상태가 변경되었습니다.", Toast.LENGTH_SHORT).show();
         });
         return  view;
     }
+    private void loadDataFromFirestore() {
+        db.collection("takes")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    takePostList.clear();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        TakePost post = doc.toObject(TakePost.class);
+                        if (post != null) {
+                            takePostList.add(post);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "데이터 불러오기 실패: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+    /*
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         Button appealBtn = view.findViewById(R.id.attend_status_appeal);
@@ -125,29 +145,6 @@ public class appealP extends Fragment {
                 reasonText.setVisibility(View.GONE);
             }
         });
-    }
-    private RecyclerView recyclerView;
-    private TakePostAdapter adapter;
-    private List<TakePost> takePostList;
-    // 파이어베이스 데리터 로드
-    //private DatabaseReference databaseReference;
-    @NonNull
-    public View Oncreate(@NonNull LayoutInflater inflater,
-                         @Nullable ViewGroup contatiner,
-                         @Nullable Bundle saveInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_appeal_p, contatiner, false);
-
-        recyclerView = view.findViewById(R.id.recyclerView_p);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        takePostList = new ArrayList<>();
-        //어댑터 연결
-        //adapter = new TakePostAdapter(List<TakePost>)
-        recyclerView.setAdapter(adapter);
-
-        //databaseReference = FirebaseStorage.getInstance().getReference("attendence");
-        //loadDataFromFireBase();
-        return  view;
-    }
+    }*/
 
 }
