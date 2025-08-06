@@ -51,4 +51,6 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore:25.0.0")
     implementation("com.google.firebase:firebase-analytics:22.0.0")
     implementation("com.google.firebase:firebase-storage:20.3.0")
+    // real time 종속성
+    implementation("com.google.firebase:firebase-database:20.3.0")
 }

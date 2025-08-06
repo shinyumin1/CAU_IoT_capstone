@@ -10,18 +10,18 @@
         android:name="com.example.attendence.ui.Attendence.Attendence"
         android:label="@string/title_attendence"
         tools:layout="@layout/fragment_attendence" />
-    <!--학생 출결 현황-->
-    <fragment
-        android:id="@+id/navigation_attendence_s"
-        android:name="com.example.attendence.appealS"
-        android:label="출결 현황"
-        tools:layout="@layout/fragment_appeal_s"/>
-    <!--교수님 출결 현황-->
-    <fragment
-        android:id="@+id/navigation_attendence_p"
-        android:name="com.example.attendence.appealP"
-        android:label="출결 현황"
-        tools:layout="@layout/fragment_appeal_p"/>
+<!--    &lt;!&ndash;학생 출결 현황&ndash;&gt;-->
+<!--    <fragment-->
+<!--        android:id="@+id/navigation_attendence_s"-->
+<!--        android:name="com.example.attendence.appealS"-->
+<!--        android:label="출결 현황"-->
+<!--        tools:layout="@layout/fragment_appeal_s"/>-->
+<!--    &lt;!&ndash;교수님 출결 현황&ndash;&gt;-->
+<!--    <fragment-->
+<!--        android:id="@+id/navigation_attendence_p"-->
+<!--        android:name="com.example.attendence.appealP"-->
+<!--        android:label="출결 현황"-->
+<!--        tools:layout="@layout/fragment_appeal_p"/>-->
 
     <fragment
         android:id="@+id/navigation_home"

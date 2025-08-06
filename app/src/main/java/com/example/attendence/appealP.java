@@ -69,7 +69,7 @@ public class appealP extends Fragment {
         super.onCreate(savedInstanceState);
 
     }
-     // db를 통해서 takePost, takePostAdapter 를 이용해 리사이클러뷰 띄위기
+    // db를 통해서 takePost, takePostAdapter 를 이용해 리사이클러뷰 띄위기
     @Override
     @Nullable
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,

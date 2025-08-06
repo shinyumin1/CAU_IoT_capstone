@@ -13,7 +13,10 @@ import androidx.lifecycle.ViewModelProvider;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import com.example.attendence.R;
 
+import com.example.attendence.appealP;
+import com.example.attendence.appealS;
 import com.example.attendence.databinding.FragmentHomeBinding;
 
 
@@ -32,8 +35,25 @@ public class Attendence extends Fragment {
         String today = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN).format(new Date());
         binding.todayDateTextView.setText(today);
 
+        String role = getActivity().getSharedPreferences("UserPrefs", getActivity().MODE_PRIVATE)
+                .getString("role", "student"); // 기본값 student
+
+        if ("student".equals(role)) {
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainer, new appealS())
+                    .commit();
+        } else if ("professor".equals(role)) {
+            getChildFragmentManager().beginTransaction()
+                    .replace(R.id.fragmentContainer, new appealP())
+                    .commit();
+        }
+
+
         return root;
     }
+
+
+
 
     @Override
     public void onDestroyView() {

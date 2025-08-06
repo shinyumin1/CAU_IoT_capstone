@@ -67,49 +67,26 @@ public class MainActivity extends AppCompatActivity {
                     .get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
-                            //role로 분기
                             String role = documentSnapshot.getString("role");
-                            binding.getRoot().post(() -> {
-                                if("student".equals(role)) {
-                                    navController.navigate(R.id.navigation_attendence_s);
-                                }
-                                else if("professor".equals(role)) {
-                                    navController.navigate(R.id.navigation_attendence_p);
-                                }else {
-                                    Log.e(TAG, "Unknown role" + role);
-                                }
+                            if (role != null) {
+                                sharedPreferences.edit().putString("role", role).apply();
 
-                            });
-                            String userName = documentSnapshot.getString("userName");
-                            if (userName != null && userNameTextView != null) {
-                                userNameTextView.setText(userName);
+                                // role에 따라 초기화면 선택
+                                if ("student".equals(role)) {
+                                    navController.navigate(R.id.navigation_attendence);
+                                } else if ("professor".equals(role)) {
+                                    navController.navigate(R.id.navigation_attendence);
+                                }
                             }
                         }
                     })
-                    .addOnFailureListener(e -> {
-                        Log.e(TAG, "사용자 이름 불러오기 실패", e);
-                    });
-        } else {
-            Log.w(TAG, "userId가 SharedPreferences에 없습니다.");
+                    .addOnFailureListener(e -> Log.e("MainActivity", "Firestore 실패", e));
         }
 
-
-
-        // AppBarConfiguration 설정
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_attendence, R.id.navigation_home, R.id.navigation_info)
                 .build();
 
-        // 액션바 + 바텀 네비게이션 연동
-        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
-
-        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            // 한번만 연결되도록 체크
-            if (binding.navView.getMenu().size() > 0) {
-                NavigationUI.setupWithNavController(binding.navView, navController);
-            }
-        });
     }
-
 }
