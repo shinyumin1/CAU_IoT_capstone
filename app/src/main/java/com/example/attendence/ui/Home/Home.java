@@ -1,5 +1,6 @@
 package com.example.attendence.ui.Home;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import com.example.attendence.databinding.FragmentHomeBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -46,6 +48,10 @@ public class Home extends Fragment {
 
         String today = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN).format(new Date());
         binding.todayDateTextView.setText(today);
+
+        ImageView calendarButton = binding.calendarButton;
+
+
 
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -96,6 +102,7 @@ public class Home extends Fragment {
 
     private void loadStudentHome(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String todayWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(new Date());
         db.collection("users")
                 .document(userId)
                 .collection("takes")
@@ -108,7 +115,8 @@ public class Home extends Fragment {
                         String classroom = doc.getString("강의실");
                         String schedule = doc.getString("시간");
 
-                        if (classroom != null && !"null".equals(classroom)) {
+                        if (classroom != null && !"null".equals(classroom)
+                                && schedule != null && schedule.contains(todayWeekday)) {
                             takeList.add(new TakePost(subject, professor, classroom, schedule));
                         }
                     }
@@ -121,6 +129,7 @@ public class Home extends Fragment {
 
     private void loadProfessorHome(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String todayWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(new Date());
         db.collection("users")
                 .document(userId)
                 .collection("lecture")
@@ -132,7 +141,9 @@ public class Home extends Fragment {
                         String classroom = doc.getString("강의실");
                         String schedule = doc.getString("시간");
 
-                        takeList.add(new TakePost(subject, " ", classroom, schedule));
+                        if (schedule != null && schedule.contains(todayWeekday)) {
+                            takeList.add(new TakePost(subject, " ", classroom, schedule));
+                        }
                     }
                     adapter.notifyDataSetChanged();
                 })

@@ -14,29 +14,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_gravity="top|start">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="2025년 7월 25일 수요일"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:textSize="18sp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/uil_calender"
-            android:layout_marginTop="-5.5dp"
-            android:layout_marginLeft="10dp"/>
 
-        <Button
-            android:layout_width="130dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="20dp"
-            android:background="@drawable/attend_appeal_blue_box"
-            android:text="출결 이의 신청"
-            android:textSize="13dp"
-
-            android:textStyle="bold" />
     </LinearLayout>
     <!--리사이클러뷰-->
     <androidx.recyclerview.widget.RecyclerView
