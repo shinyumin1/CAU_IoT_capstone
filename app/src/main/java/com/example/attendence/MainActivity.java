@@ -68,6 +68,12 @@ public class MainActivity extends AppCompatActivity {
                     .addOnSuccessListener(documentSnapshot -> {
                         if (documentSnapshot.exists()) {
                             String role = documentSnapshot.getString("role");
+                            String name = documentSnapshot.getString("userName");
+
+                            if (name != null && userNameTextView != null) {
+                                userNameTextView.setText(name);
+                            }
+
                             if (role != null) {
                                 sharedPreferences.edit().putString("role", role).apply();
 
