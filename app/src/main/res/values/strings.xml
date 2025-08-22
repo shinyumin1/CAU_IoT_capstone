@@ -14,4 +14,16 @@
     <string name="ex_reason">사유: 출석 후 장염에 걸려서
     11분 동안  화장실에 다녀왔는데 지각 처리가 되었습니다.
     확인부탁드립니다.</string>
+
+    <string-array name="standard_spinner">
+        <item>출석기준</item>
+        <item>60분</item>
+        <item>50분</item>
+        <item>40분</item>
+        <item>30분</item>
+        <item>20분</item>
+        <item>10분</item>
+        <item>0분</item>
+    </string-array>
+
 </resources>

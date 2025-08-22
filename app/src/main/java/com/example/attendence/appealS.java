@@ -101,23 +101,6 @@ public class appealS extends Fragment {
                     Toast.makeText(getContext(), "데이터 불러오기 실패: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-    /**
-     @Override
-     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-     super.onViewCreated(view, savedInstanceState);
-
-     Button appealStatusBtn = view.findViewById(R.id.attend_status_appeal);
-     LinearLayout appealEditBox = view.findViewById(R.id.student_appeal_editbox);
-
-
-     appealStatusBtn.setOnClickListener(v -> {
-     if (appealEditBox.getVisibility() == View.GONE) {
-     appealEditBox.setVisibility(View.VISIBLE);
-     } else {
-     appealEditBox.setVisibility(View.GONE);
-     }
-     });
-
-
-     }*/
+    /*
+     */
 }

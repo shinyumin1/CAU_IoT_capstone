@@ -30,7 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import com.example.attendence.TakePost;
 import com.example.attendence.TakePostAdapter;
-
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 
 public class Info extends Fragment {
 
@@ -44,7 +46,8 @@ public class Info extends Fragment {
     private RecyclerView recyclerView;
     private TakePostAdapter adapter;
     private List<TakePost> takeList = new ArrayList<>();
-
+    private Spinner standardSpinner;
+    private List<String> standardList = new ArrayList<>();
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -67,6 +70,7 @@ public class Info extends Fragment {
         // Firestore에서 사용자 정보 불러오기
         sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         String userId = sharedPreferences.getString(KEY_USER_ID, null);
+
 
         if (userId != null) {
             db.collection("users")
@@ -163,6 +167,8 @@ public class Info extends Fragment {
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "강의 데이터 불러오기 실패", e));
     }
+    //spinner에서 선택시 DB에 반영되도록
+
 
 
 

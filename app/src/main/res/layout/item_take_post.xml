@@ -87,5 +87,17 @@
             android:visibility="gone"
             android:textSize="18sp"
             android:textStyle="bold"/>
+        <!--출석 기준 버튼 ( 스피너로 만듬 )-->
+        <Spinner
+            android:id="@+id/stand_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/blue_box_small"
+            android:layout_marginEnd="20dp"
+            android:visibility="gone"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:entries="@array/standard_spinner"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

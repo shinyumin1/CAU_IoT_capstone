@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -50,9 +53,11 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
         if (!showButtons) {
             holder.btnSelectSeat.setVisibility(View.GONE);
             holder.btnSeatStatus.setVisibility(View.GONE);
+            holder.statusSpinner.setVisibility(View.GONE);
         } else if (isStudent) {
             holder.btnSelectSeat.setVisibility(View.VISIBLE);
             holder.btnSeatStatus.setVisibility(View.GONE);
+            holder.statusSpinner.setVisibility(View.GONE);
             holder.btnSelectSeat.setOnClickListener(v -> {
                 Intent intent = new Intent(context, SelectSeatActivity.class);
                 intent.putExtra("과목명", post.getSubject());
@@ -64,6 +69,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
         } else {
             holder.btnSelectSeat.setVisibility(View.GONE);
             holder.btnSeatStatus.setVisibility(View.VISIBLE);
+            holder.statusSpinner.setVisibility(View.VISIBLE);
             holder.btnSeatStatus.setOnClickListener(v -> {
                 Intent intent = new Intent(context, SeatStatusActivity.class);
                 intent.putExtra("과목명", post.getSubject());
@@ -71,6 +77,16 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 intent.putExtra("강의실", post.getClassroom());
                 context.startActivity(intent);
             });
+            //spinner 세팅
+            ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+                    context,
+                    R.array.standard_spinner,
+                    android.R.layout.simple_spinner_item
+            );
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            holder.statusSpinner.setAdapter(spinnerAdapter);
+            //spinner 리스너 세팅
+
         }
     }
 
@@ -82,6 +98,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView subject, professor,classroom,schedule;
         Button btnSelectSeat, btnSeatStatus;
+        Spinner statusSpinner;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -91,6 +108,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
             schedule = itemView.findViewById(R.id.tv_schedule);
             btnSelectSeat = itemView.findViewById(R.id.btn_select_seat);
             btnSeatStatus = itemView.findViewById(R.id.btn_seat_status);
+            statusSpinner = itemView.findViewById(R.id.stand_spinner);
         }
     }
 }
