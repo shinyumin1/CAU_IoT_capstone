@@ -108,6 +108,11 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 );
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
                 holder.standSpinner.setAdapter(spinnerAdapter);
+                //현재 DB 값과 일치하는 위치 선택
+                if (post.getAttendenceStandard() != null) {
+                    int pos = spinnerAdapter.getPosition(post.getAttendenceStandard());
+                    if (pos >= 0) holder.standSpinner.setSelection(pos);
+                }
                 holder.standSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

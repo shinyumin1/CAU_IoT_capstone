@@ -72,7 +72,22 @@ public class Info extends Fragment {
         sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         String userId = sharedPreferences.getString(KEY_USER_ID, null);
 
-
+        //spinner envent listener 등록
+        adapter.setOnSpinnerItemSelectedListener((post, selectedStandard) -> {
+            if(userId !=null){
+                db.collection("users")
+                        .document(userId)
+                        .collection("lecture")
+                        .document(post.getId())
+                        .update("출석기준", selectedStandard)
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d(TAG, "출석기준 업데이트 성공: " + selectedStandard);
+                            post.setAttendenceStandard(selectedStandard); // UI 갱신
+                            adapter.notifyDataSetChanged();
+                        })
+                        .addOnFailureListener(e -> Log.e(TAG, "출석기준 업데이트 실패", e));
+            }
+        });
         if (userId != null) {
             db.collection("users")
                     .document(userId)
@@ -162,7 +177,7 @@ public class Info extends Fragment {
                                     professor != null ? professor : "", // 빈칸 처리
                                     classroom,
                                     schedule,
-                                    attendenceStandard
+                                    attendenceStandard != null ? attendenceStandard : "0분"
                             ));
 
                         }
