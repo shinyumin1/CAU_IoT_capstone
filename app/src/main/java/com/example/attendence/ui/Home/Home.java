@@ -117,7 +117,7 @@ public class Home extends Fragment {
 
                         if (classroom != null && !"null".equals(classroom)
                                 && schedule != null && schedule.contains(todayWeekday)) {
-                            takeList.add(new TakePost(subject, professor, classroom, schedule));
+                            takeList.add(new TakePost(subject, professor, classroom, schedule, ""));
                         }
                     }
                     adapter.notifyDataSetChanged();
@@ -142,7 +142,7 @@ public class Home extends Fragment {
                         String schedule = doc.getString("시간");
 
                         if (schedule != null && schedule.contains(todayWeekday)) {
-                            takeList.add(new TakePost(subject, " ", classroom, schedule));
+                            takeList.add(new TakePost(subject, " ", classroom, schedule,""));
                         }
                     }
                     adapter.notifyDataSetChanged();

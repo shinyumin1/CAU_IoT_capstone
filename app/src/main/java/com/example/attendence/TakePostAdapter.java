@@ -14,6 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.List;
 
 public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHolder> {
@@ -23,6 +25,15 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     private boolean isStudent;
     private boolean showButtons;
 
+    public interface OnSpinnerItemSelectedListener {
+        void onItemSelected(TakePost post, String selectedStandard);
+    }
+
+    private OnSpinnerItemSelectedListener spinnerListener;
+
+    public void setOnSpinnerItemSelectedListener(OnSpinnerItemSelectedListener listener) {
+        this.spinnerListener = listener;
+    }
 
     public TakePostAdapter(Context context, List<TakePost> takeList, boolean isStudent,  boolean showButtons) {
         this.context = context;
@@ -34,7 +45,14 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     public TakePostAdapter(Context context, List<TakePost> takeList, boolean isStudent) {
         this(context, takeList, isStudent, true);
     }
+    public  enum ProfessorViewType {
+        BUTTON, SPINNER
+    }
+    private ProfessorViewType professorViewType = ProfessorViewType.BUTTON;
 
+    public void setProfessorViewType(ProfessorViewType type) {
+        this.professorViewType = type;
+    }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -53,11 +71,11 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
         if (!showButtons) {
             holder.btnSelectSeat.setVisibility(View.GONE);
             holder.btnSeatStatus.setVisibility(View.GONE);
-            holder.statusSpinner.setVisibility(View.GONE);
+            holder.standSpinner.setVisibility(View.GONE);
         } else if (isStudent) {
             holder.btnSelectSeat.setVisibility(View.VISIBLE);
             holder.btnSeatStatus.setVisibility(View.GONE);
-            holder.statusSpinner.setVisibility(View.GONE);
+            holder.standSpinner.setVisibility(View.GONE);
             holder.btnSelectSeat.setOnClickListener(v -> {
                 Intent intent = new Intent(context, SelectSeatActivity.class);
                 intent.putExtra("과목명", post.getSubject());
@@ -68,25 +86,43 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
             });
         } else {
             holder.btnSelectSeat.setVisibility(View.GONE);
-            holder.btnSeatStatus.setVisibility(View.VISIBLE);
-            holder.statusSpinner.setVisibility(View.VISIBLE);
-            holder.btnSeatStatus.setOnClickListener(v -> {
-                Intent intent = new Intent(context, SeatStatusActivity.class);
-                intent.putExtra("과목명", post.getSubject());
-                intent.putExtra("시간", post.getSchedule());
-                intent.putExtra("강의실", post.getClassroom());
-                context.startActivity(intent);
-            });
-            //spinner 세팅
-            ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
-                    context,
-                    R.array.standard_spinner,
-                    android.R.layout.simple_spinner_item
-            );
-            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            holder.statusSpinner.setAdapter(spinnerAdapter);
-            //spinner 리스너 세팅
 
+            if (professorViewType == ProfessorViewType.BUTTON) {
+                holder.btnSeatStatus.setVisibility(View.VISIBLE);
+                holder.standSpinner.setVisibility(View.GONE);
+                holder.btnSeatStatus.setOnClickListener(v -> {
+                    Intent intent = new Intent(context, SeatStatusActivity.class);
+                    intent.putExtra("과목명", post.getSubject());
+                    intent.putExtra("시간", post.getSchedule());
+                    intent.putExtra("강의실", post.getClassroom());
+                    context.startActivity(intent);
+                });
+            } else {
+                holder.btnSeatStatus.setVisibility(View.GONE);
+                holder.standSpinner.setVisibility(View.VISIBLE);
+                //spinner 세팅
+                ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+                        context,
+                        R.array.standard_spinner,
+                        android.R.layout.simple_spinner_item
+                );
+                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+                holder.standSpinner.setAdapter(spinnerAdapter);
+                holder.standSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        String selected = parent.getItemAtPosition(position).toString();
+                        if (spinnerListener != null) {
+                            spinnerListener.onItemSelected(post, selected);
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+            }
         }
     }
 
@@ -98,7 +134,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView subject, professor,classroom,schedule;
         Button btnSelectSeat, btnSeatStatus;
-        Spinner statusSpinner;
+        Spinner standSpinner;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -108,7 +144,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
             schedule = itemView.findViewById(R.id.tv_schedule);
             btnSelectSeat = itemView.findViewById(R.id.btn_select_seat);
             btnSeatStatus = itemView.findViewById(R.id.btn_seat_status);
-            statusSpinner = itemView.findViewById(R.id.stand_spinner);
+            standSpinner = itemView.findViewById(R.id.stand_spinner);
         }
     }
 }

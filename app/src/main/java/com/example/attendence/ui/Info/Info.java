@@ -64,8 +64,9 @@ public class Info extends Fragment {
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new TakePostAdapter(getContext(), takeList, false, false);
+        adapter = new TakePostAdapter(getContext(), takeList, false, true);
         recyclerView.setAdapter(adapter);
+        adapter.setProfessorViewType(TakePostAdapter.ProfessorViewType.SPINNER);
 
         // Firestore에서 사용자 정보 불러오기
         sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
@@ -131,7 +132,7 @@ public class Info extends Fragment {
                         String schedule = doc.getString("시간");
 
                         if (subject != null && classroom != null && schedule != null) {
-                            takeList.add(new TakePost(subject, professor!=null?professor : "", classroom, schedule));
+                            takeList.add(new TakePost(subject, professor!=null?professor : "", classroom, schedule,""));
                         }
                     }
                     adapter.notifyDataSetChanged();
@@ -153,24 +154,24 @@ public class Info extends Fragment {
                         String professor = doc.getString("교수명");
                         String classroom = doc.getString("강의실");
                         String schedule = doc.getString("시간");
+                        String attendenceStandard = doc.getString("출석기준");
 
                         if (subject != null && classroom != null && schedule != null) {
                             takeList.add(new TakePost(
                                     subject,
                                     professor != null ? professor : "", // 빈칸 처리
                                     classroom,
-                                    schedule
+                                    schedule,
+                                    attendenceStandard
                             ));
+
                         }
                     }
+                    // spinner에 대한 처리
                     adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> Log.e(TAG, "강의 데이터 불러오기 실패", e));
     }
-    //spinner에서 선택시 DB에 반영되도록
-
-
-
 
     // 로그아웃 처리 메서드
     private void handleLogout() {
