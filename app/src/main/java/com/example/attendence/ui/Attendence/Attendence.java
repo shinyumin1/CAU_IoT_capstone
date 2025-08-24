@@ -28,6 +28,7 @@ import com.example.attendence.TakePost;
 import com.example.attendence.TakePostAdapter;
 import com.example.attendence.appealP;
 import com.example.attendence.appealS;
+import com.example.attendence.databinding.FragmentAttendenceBinding;
 import com.example.attendence.databinding.FragmentHomeBinding;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -35,17 +36,17 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 public class Attendence extends Fragment {
 
-    private FragmentHomeBinding binding;
+    private FragmentAttendenceBinding binding;
     private RecyclerView recyclerView;
     private TakePostAdapter adapter;
     private List<TakePost> takeList = new ArrayList<>();
-
+    private TakePost currentSelectedPost;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        AttendenceViewModel homeViewModel =
+        AttendenceViewModel AttendenceViewModel =
                 new ViewModelProvider(this).get(AttendenceViewModel.class);
 
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
+        binding = FragmentAttendenceBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         String today = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN).format(new Date());
@@ -97,6 +98,23 @@ public class Attendence extends Fragment {
                             recyclerView.setAdapter(adapter);
                             loadStudentAttendence(userId);  // 학생용 데이터 불러오기
 
+                            adapter.setOnStudentAppealClickListener(post -> {
+                                binding.studentAppealEditbox.setVisibility(View.VISIBLE);
+                                binding.studentAppealButton.setVisibility(View.VISIBLE);
+                                currentSelectedPost = post; // 클릭한 과목정보 저장
+                            });
+                            binding.studentAppealButton.setOnClickListener(v -> {
+                                if(currentSelectedPost == null) {
+                                    Toast.makeText(getContext(), "먼저 과목을 선택하세요.", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                String appealText = binding.etStudentAppeal.getText().toString().trim();
+                                if (appealText.isEmpty()) {
+                                    Toast.makeText(getContext(), "사유를 입력해주세요.", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                submitStudentAttendence(appealText);
+                            });
                         } else if ("professor".equals(role)) {
                             binding.attendenceCheckS.setVisibility(View.GONE);
                             adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
@@ -145,6 +163,9 @@ public class Attendence extends Fragment {
                 .addOnFailureListener(e -> {
                     Log.e("Home", "학생 데이터 불러오기 실패: ", e);
                 });
+    }
+    private void submitStudentAttendence(String userId) {
+        // text 필드 추가해서 db 넣기
     }
     private void loadProfessorAttendence(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();

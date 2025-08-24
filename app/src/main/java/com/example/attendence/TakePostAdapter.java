@@ -55,6 +55,14 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     public void setProfessorViewType(ProfessorViewType type) {
         this.professorViewType = type;
     }
+    public interface OnstudentAppealClickListener {
+        void onAppealClick(TakePost post);
+    }
+    private  OnstudentAppealClickListener appealListener;
+
+    public void setOnStudentAppealClickListener(OnstudentAppealClickListener listener){
+        this.appealListener = listener;
+    }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -96,12 +104,9 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 holder.btnSelectSeat.setVisibility(View.GONE);
                 holder.btnStudAttend.setVisibility(View.VISIBLE);
                 holder.btnStudAttend.setOnClickListener(v -> {
-                    Intent intent = new Intent(context, SelectSeatActivity.class);
-                    intent.putExtra("과목명", post.getSubject());
-                    intent.putExtra("교수명", post.getProfessor());
-                    intent.putExtra("강의실", post.getClassroom());
-                    intent.putExtra("시간", post.getSchedule());
-                    context.startActivity(intent);
+                    if(appealListener != null) {
+                        appealListener.onAppealClick(post);
+                    }
                 });
             }
 

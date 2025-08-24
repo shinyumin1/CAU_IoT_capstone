@@ -34,8 +34,7 @@
         android:layout_gravity="center|bottom"
         android:layout_marginBottom="140dp"
         android:background="@drawable/appeal_box"
-        android:padding="12dp"
-        android:visibility="gone">
+        android:padding="12dp">
 
         <EditText
 
