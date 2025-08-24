@@ -64,35 +64,11 @@ public class Info extends Fragment {
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new TakePostAdapter(getContext(), takeList, false, true, "");
-        recyclerView.setAdapter(adapter);
-        adapter.setProfessorViewType(TakePostAdapter.ProfessorViewType.SPINNER);
 
         // Firestore에서 사용자 정보 불러오기
         sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         String userId = sharedPreferences.getString(KEY_USER_ID, null);
 
-        //spinner envent listener 등록
-        adapter.setOnSpinnerItemSelectedListener((post, selectedStandard) -> {
-            if(userId !=null){
-                if(post.getId() == null){
-                    Log.e(TAG, "post.getId()가 null입니다!");
-                    Toast.makeText(getContext(), "문서 ID가 없습니다.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                db.collection("users")
-                        .document(userId)
-                        .collection("lecture")
-                        .document(post.getId())
-                        .update("출석기준", selectedStandard)
-                        .addOnSuccessListener(aVoid -> {
-                            Log.d(TAG, "출석기준 업데이트 성공: " + selectedStandard);
-                            post.setAttendenceStandard(selectedStandard); // UI 갱신
-                            adapter.notifyDataSetChanged();
-                        })
-                        .addOnFailureListener(e -> Log.e(TAG, "출석기준 업데이트 실패", e));
-            }
-        });
         if (userId != null) {
             db.collection("users")
                     .document(userId)
@@ -102,7 +78,6 @@ public class Info extends Fragment {
                             String userName = documentSnapshot.getString("userName");
                             String department = documentSnapshot.getString("department");
                             String gender = documentSnapshot.getString("gender");
-                            String weight = documentSnapshot.getString("weight");
                             String role = documentSnapshot.getString("role");
                             if (userName != null) {
                                 binding.tvUserName.setText("이름 : " + userName);
@@ -117,12 +92,32 @@ public class Info extends Fragment {
                             if (gender!=null){
                                 binding.tvUserGender.setText("성별 : "+ gender);
                             }
-                            if (weight!=null){
-                                binding.tvUserWeight.setText("체중 : "+weight+"kg");
-                            }
                             if ("professor".equals(role)) {
+                                adapter = new TakePostAdapter(getContext(), takeList, false, true, "");
+                                adapter.setProfessorViewType(TakePostAdapter.ProfessorViewType.SPINNER);
+                                recyclerView.setAdapter(adapter);
+
                                 loadLecturePosts(userId); // 교수 전용
+
+                                // 스피너 이벤트 리스너 등록 (교수 전용 기능)
+                                adapter.setOnSpinnerItemSelectedListener((post, selectedStandard) -> {
+                                    if (userId != null && post.getId() != null) {
+                                        db.collection("users")
+                                                .document(userId)
+                                                .collection("lecture")
+                                                .document(post.getId())
+                                                .update("출석기준", selectedStandard)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Log.d(TAG, "출석기준 업데이트 성공: " + selectedStandard);
+                                                    post.setAttendenceStandard(selectedStandard);
+                                                    adapter.notifyDataSetChanged();
+                                                })
+                                                .addOnFailureListener(e -> Log.e(TAG, "출석기준 업데이트 실패", e));
+                                    }
+                                });
                             } else {
+                                adapter = new TakePostAdapter(getContext(), takeList, false, false, "");
+                                recyclerView.setAdapter(adapter);
                                 loadTakePosts(userId);    // 학생 전용
                             }
                         }
