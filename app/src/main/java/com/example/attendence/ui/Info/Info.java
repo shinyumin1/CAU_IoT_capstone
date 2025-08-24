@@ -64,7 +64,7 @@ public class Info extends Fragment {
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new TakePostAdapter(getContext(), takeList, false, true);
+        adapter = new TakePostAdapter(getContext(), takeList, false, true, "");
         recyclerView.setAdapter(adapter);
         adapter.setProfessorViewType(TakePostAdapter.ProfessorViewType.SPINNER);
 

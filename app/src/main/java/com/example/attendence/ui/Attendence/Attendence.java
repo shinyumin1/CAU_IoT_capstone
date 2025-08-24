@@ -1,6 +1,9 @@
 package com.example.attendence.ui.Attendence;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,20 +13,32 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import com.example.attendence.R;
 
+import com.example.attendence.TakePost;
+import com.example.attendence.TakePostAdapter;
 import com.example.attendence.appealP;
 import com.example.attendence.appealS;
 import com.example.attendence.databinding.FragmentHomeBinding;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 
 public class Attendence extends Fragment {
 
     private FragmentHomeBinding binding;
+    private RecyclerView recyclerView;
+    private TakePostAdapter adapter;
+    private List<TakePost> takeList = new ArrayList<>();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -35,6 +50,11 @@ public class Attendence extends Fragment {
 
         String today = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN).format(new Date());
         binding.todayDateTextView.setText(today);
+        recyclerView = binding.rvTakePosts;
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
+        recyclerView.setAdapter(adapter);
+
 
         binding.calendarButton.setVisibility(View.VISIBLE);
         binding.calendarButton.setOnClickListener(v -> {
@@ -57,32 +77,99 @@ public class Attendence extends Fragment {
             datePickerDialog.show();
         });
 
-        binding.attendenceCheckS.setVisibility(View.VISIBLE);
-        binding.attendenceCheckS.setOnClickListener(v -> {
-            // 추후 구현해야 하는 부분.. 현재는 토스트만 띄우게 설정
-            Toast.makeText(getContext(), "출결 이의 신청 클릭됨", Toast.LENGTH_SHORT).show();
-        });
 
-        String role = getActivity().getSharedPreferences("UserPrefs", getActivity().MODE_PRIVATE)
-                .getString("role", "student"); // 기본값 student
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = getUserIdFromPrefs();
 
-        if ("student".equals(role)) {
-            getChildFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new appealS())
-                    .commit();
-        } else if ("professor".equals(role)) {
-            getChildFragmentManager().beginTransaction()
-                    .replace(R.id.fragmentContainer, new appealP())
-                    .commit();
-        }
+        db.collection("users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String role = documentSnapshot.getString("role");
+                        if ("student".equals(role)) {
+                            binding.attendenceCheckS.setVisibility(View.VISIBLE);
+                            binding.attendenceCheckS.setOnClickListener(v -> {
+                                // 추후 구현해야 하는 부분.. 현재는 토스트만 띄우게 설정
+                                Toast.makeText(getContext(), "출결 이의 신청 클릭됨", Toast.LENGTH_SHORT).show();
+                            });
+                            adapter = new TakePostAdapter(getContext(), takeList, true, "ATTEND");
+                            recyclerView.setAdapter(adapter);
+                            loadStudentAttendence(userId);  // 학생용 데이터 불러오기
 
+                        } else if ("professor".equals(role)) {
+                            binding.attendenceCheckS.setVisibility(View.GONE);
+                            adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
+                            recyclerView.setAdapter(adapter);
+                            loadProfessorAttendence(userId); // 교수용 데이터 불러오기
+                        } else {
+                            Log.e("Home", "알 수 없는 역할: " + role);
+                        }
+                    } else {
+                        Log.e("Home", "해당 사용자 문서 없음");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Home", "사용자 role 가져오기 실패: ", e);
+                });
 
         return root;
     }
+    private String getUserIdFromPrefs(){
+        SharedPreferences prefs = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
+        return prefs.getString("userId","");
+    }
 
+    private void loadStudentAttendence(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String todayWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(new Date());
+        db.collection("users")
+                .document(userId)
+                .collection("takes")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    takeList.clear();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        String subject = doc.getString("과목명");
+                        String professor = doc.getString("교수명");
+                        String classroom = doc.getString("강의실");
+                        String schedule = doc.getString("시간");
 
+                        if (classroom != null && !"null".equals(classroom)
+                                && schedule != null && schedule.contains(todayWeekday)) {
+                            takeList.add(new TakePost(subject, professor, classroom, schedule, "", doc.getId()));
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Home", "학생 데이터 불러오기 실패: ", e);
+                });
+    }
+    private void loadProfessorAttendence(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String todayWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(new Date());
+        db.collection("users")
+                .document(userId)
+                .collection("lecture")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    takeList.clear();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        String subject = doc.getString("과목명");
+                        String classroom = doc.getString("강의실");
+                        String schedule = doc.getString("시간");
 
-
+                        if (schedule != null && schedule.contains(todayWeekday)) {
+                            takeList.add(new TakePost(subject, " ", classroom, schedule,"",doc.getId()));
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Home", "교수 데이터 불러오기 실패: ", e);
+                });
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();

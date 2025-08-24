@@ -72,7 +72,7 @@ public class appealS extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView_s);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         takePostList = new ArrayList<>();
-        adapter = new TakePostAdapter(getContext(), takePostList, true);
+        adapter = new TakePostAdapter(getContext(), takePostList, true, "ATTEND");
         recyclerView.setAdapter(adapter);
         db = FirebaseFirestore.getInstance();
         loadDataFromFirestore();

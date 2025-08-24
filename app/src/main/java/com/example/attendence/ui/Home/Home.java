@@ -55,7 +55,7 @@ public class Home extends Fragment {
 
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new TakePostAdapter(getContext(), takeList, false);
+        adapter = new TakePostAdapter(getContext(), takeList, false, "HOME");
         recyclerView.setAdapter(adapter);
 
         // 파이어베이스에서 take 데이터 불러오기
@@ -69,11 +69,11 @@ public class Home extends Fragment {
                     if (documentSnapshot.exists()) {
                         String role = documentSnapshot.getString("role");
                         if ("student".equals(role)) {
-                            adapter = new TakePostAdapter(getContext(), takeList, true);
+                            adapter = new TakePostAdapter(getContext(), takeList, true, "Home");
                             recyclerView.setAdapter(adapter);
                             loadStudentHome(userId);  // 학생용 데이터 불러오기
                         } else if ("professor".equals(role)) {
-                            adapter = new TakePostAdapter(getContext(), takeList, false);
+                            adapter = new TakePostAdapter(getContext(), takeList, false, "HOME");
                             recyclerView.setAdapter(adapter);
                             loadProfessorHome(userId); // 교수용 데이터 불러오기
                         } else {

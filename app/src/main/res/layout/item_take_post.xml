@@ -87,6 +87,28 @@
             android:visibility="gone"
             android:textSize="18sp"
             android:textStyle="bold"/>
+        <Button
+            android:id="@+id/prof_attendence_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/blue_box_small"
+            android:layout_marginEnd="20dp"
+            android:text="30분/60분"
+            android:visibility="gone"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+        <Button
+            android:id="@+id/stud_attendencd_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/blue_box_small"
+            android:layout_marginEnd="20dp"
+            android:text="지각"
+            android:visibility="gone"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
         <!--출석 기준 버튼 ( 스피너로 만듬 )-->
         <androidx.appcompat.widget.AppCompatSpinner
             android:id="@+id/stand_spinner"

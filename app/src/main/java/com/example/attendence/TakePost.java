@@ -7,6 +7,7 @@ public class TakePost {
     private String classroom;
     private String schedule;
     private String attendenceStandard;
+    //화면에 따라 버튼이 달라지도록
     public TakePost() {} // Firestore 직렬화용
 
     public TakePost(String subject, String professor,String classroom,String schedule,String attendenceStandard,String id) {
