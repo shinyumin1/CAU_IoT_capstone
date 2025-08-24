@@ -9,7 +9,7 @@ public class TakePost {
     private String attendenceStandard;
     public TakePost() {} // Firestore 직렬화용
 
-    public TakePost(String subject, String professor,String classroom,String schedule,String attendenceStandard) {
+    public TakePost(String subject, String professor,String classroom,String schedule,String attendenceStandard,String id) {
         this.id = id;
         this.subject = subject;
         this.professor = professor;

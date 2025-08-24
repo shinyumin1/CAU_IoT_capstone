@@ -75,6 +75,11 @@ public class Info extends Fragment {
         //spinner envent listener 등록
         adapter.setOnSpinnerItemSelectedListener((post, selectedStandard) -> {
             if(userId !=null){
+                if(post.getId() == null){
+                    Log.e(TAG, "post.getId()가 null입니다!");
+                    Toast.makeText(getContext(), "문서 ID가 없습니다.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 db.collection("users")
                         .document(userId)
                         .collection("lecture")
@@ -147,7 +152,8 @@ public class Info extends Fragment {
                         String schedule = doc.getString("시간");
 
                         if (subject != null && classroom != null && schedule != null) {
-                            takeList.add(new TakePost(subject, professor!=null?professor : "", classroom, schedule,""));
+                            String docId = doc.getId();
+                            takeList.add(new TakePost(subject, professor!=null?professor : "", classroom, schedule,"",docId));
                         }
                     }
                     adapter.notifyDataSetChanged();
@@ -172,12 +178,14 @@ public class Info extends Fragment {
                         String attendenceStandard = doc.getString("출석기준");
 
                         if (subject != null && classroom != null && schedule != null) {
+                            String docId = doc.getId();
                             takeList.add(new TakePost(
                                     subject,
                                     professor != null ? professor : "", // 빈칸 처리
                                     classroom,
                                     schedule,
-                                    attendenceStandard != null ? attendenceStandard : "0분"
+                                    attendenceStandard != null ? attendenceStandard : "0분",
+                                    docId
                             ));
 
                         }
