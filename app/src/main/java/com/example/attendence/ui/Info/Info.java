@@ -148,7 +148,8 @@ public class Info extends Fragment {
 
                         if (subject != null && classroom != null && schedule != null) {
                             String docId = doc.getId();
-                            takeList.add(new TakePost(subject, professor!=null?professor : "", classroom, schedule,"",docId));
+                            String profId = doc.getString("professorId");
+                            takeList.add(new TakePost(subject, professor!=null?professor : "", classroom, schedule,"",docId,profId));
                         }
                     }
                     adapter.notifyDataSetChanged();
@@ -174,13 +175,15 @@ public class Info extends Fragment {
 
                         if (subject != null && classroom != null && schedule != null) {
                             String docId = doc.getId();
+                            String profId = doc.getString("professorId");
                             takeList.add(new TakePost(
                                     subject,
                                     professor != null ? professor : "", // 빈칸 처리
                                     classroom,
                                     schedule,
                                     attendenceStandard != null ? attendenceStandard : "0분",
-                                    docId
+                                    docId,
+                                    profId
                             ));
 
                         }

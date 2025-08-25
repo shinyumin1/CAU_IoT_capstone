@@ -20,6 +20,7 @@ import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import com.example.attendence.R;
@@ -225,7 +226,7 @@ public class Attendence extends Fragment {
 
                         if (classroom != null && !"null".equals(classroom)
                                 && schedule != null && schedule.contains(weekday)) {
-                            TakePost takePost = new TakePost(subject, professor, classroom, schedule, "", doc.getId());
+                            TakePost takePost = new TakePost(subject, professor, classroom, schedule, "", doc.getId(), currentSelectedPost.getProfId());
 
                             // 해당 날짜의 출결/사유 불러오기
                             db.collection("users")
@@ -256,23 +257,50 @@ public class Attendence extends Fragment {
     private void submitStudentAttendence(String appealText, String dateId) {
         // text 필드 추가해서 db 넣기
         if (currentSelectedPost == null) return ;
-        String userId = getUserIdFromPrefs();
+        String studentId = getUserIdFromPrefs();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
-                .document(userId)
-                .collection("takes")
-                .document(currentSelectedPost.getId()) //수강 과목 id
-                .collection("date")
-                .document(dateId) // 사유 . 지각한 날짜
-                .update("reason", appealText)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "이의신청이 제출되었습니다.", Toast.LENGTH_SHORT).show();
-                    binding.studentAppealEditbox.setVisibility(View.GONE);
-                    binding.studentAppealButton.setVisibility(View.GONE);
+                .document(studentId)
+                .get()
+                .addOnSuccessListener(studentDoc ->{
+                    if(studentDoc.exists() && "student".equals(studentDoc.getString("role"))){
+                        db.collection("users")
+                                .document(studentId)
+                                .collection("takes")
+                                .document(currentSelectedPost.getId()) //수강 과목 id
+                                .collection("date")
+                                .document(dateId) // 사유 . 지각한 날짜
+                                .update("reason", appealText)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(getContext(), "이의신청이 제출되었습니다.", Toast.LENGTH_SHORT).show();
+                                    binding.studentAppealEditbox.setVisibility(View.GONE);
+                                    binding.studentAppealButton.setVisibility(View.GONE);
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(getContext(), "제출 실패", Toast.LENGTH_SHORT).show();
+                                });
+                        String profId = currentSelectedPost.getProfId();
+                        if (profId != null && !profId.isEmpty()) {
+                            db.collection("users")
+                                    .document(profId)
+                                    .collection("lecture")
+                                    .document(currentSelectedPost.getId())
+                                    .collection("date")
+                                    .document(dateId)
+                                    .collection("attendance")
+                                    .document(studentId)
+                                    .set(new HashMap<String, Object>() {{
+                                        put("reason", appealText); // 필요시 출결 상태도 같이 저장
+                                    }});
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "학생 계정이 아닙니다",Toast.LENGTH_SHORT).show();
+                    }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "제출 실패", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "사용자 정보 조회 실패", Toast.LENGTH_SHORT).show();
                 });
+
     }
     private void loadProfessorAttendence(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -289,7 +317,7 @@ public class Attendence extends Fragment {
                         String schedule = doc.getString("시간");
 
                         if (schedule != null && schedule.contains(todayWeekday)) {
-                            takeList.add(new TakePost(subject, " ", classroom, schedule,"",doc.getId()));
+                            takeList.add(new TakePost(subject, " ", classroom, schedule,"",doc.getId(), currentSelectedPost.getProfId()));
                         }
                     }
                     adapter.notifyDataSetChanged();
