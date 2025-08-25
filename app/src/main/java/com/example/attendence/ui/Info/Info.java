@@ -64,7 +64,8 @@ public class Info extends Fragment {
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-
+        adapter = new TakePostAdapter(getContext(), takeList, false, false, "");
+        recyclerView.setAdapter(adapter);
         // Firestore에서 사용자 정보 불러오기
         sharedPreferences = requireActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         String userId = sharedPreferences.getString(KEY_USER_ID, null);
