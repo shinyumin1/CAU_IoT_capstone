@@ -51,14 +51,25 @@ public class Attendence extends Fragment {
         binding = FragmentAttendenceBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // 오늘 날짜 표시
         String today = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN).format(new Date());
         binding.todayDateTextView.setText(today);
+
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
         recyclerView.setAdapter(adapter);
 
+        // 오늘 요일 계산
+        String todayWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(new Date());
 
+        // 사용자 ID 가져오기
+        String userId = getUserIdFromPrefs();
+
+        // 초기 학생 데이터 불러오기
+        loadStudentAttendence(userId, selectedDateId, todayWeekday);
+
+        // 달력 버튼
         binding.calendarButton.setVisibility(View.VISIBLE);
         binding.calendarButton.setOnClickListener(v -> {
             final java.util.Calendar calendar = java.util.Calendar.getInstance();
@@ -71,12 +82,13 @@ public class Attendence extends Fragment {
                     (view, selectedYear, selectedMonth, selectedDay) -> {
                         java.util.Calendar selectedDate = java.util.Calendar.getInstance();
                         selectedDate.set(selectedYear, selectedMonth, selectedDay);
+
                         // 화면에 보이는 날짜
                         String formattedDate = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN)
                                 .format(selectedDate.getTime());
                         binding.todayDateTextView.setText(formattedDate);
 
-                        // Firebase 문서 id용 (yyMMdd 형식)
+                        // Firebase 문서 dateId용
                         selectedDateId = new SimpleDateFormat("yyMMdd",Locale.KOREAN).format(selectedDate.getTime());
 
                         // EditText와 버튼 초기화
@@ -85,13 +97,15 @@ public class Attendence extends Fragment {
                         binding.studentAppealButton.setVisibility(View.GONE);
                         currentSelectedPost = null; // 선택된 과목 초기화
 
+                        // 선택한 날짜 요일 계산
+                        String selectedWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(selectedDate.getTime());
+
                         // 어댑터에 전달
                         adapter.setSelectedDate(selectedDateId);
                         adapter.notifyDataSetChanged();
 
                         // 선택된 날짜 기준으로 데이터 다시 불러오기
-                        String userId = getUserIdFromPrefs();
-                        loadStudentAttendence(userId, selectedDateId);
+                        loadStudentAttendence(userId, selectedDateId, selectedWeekday);
                     },
                     year, month, day
             );
@@ -100,7 +114,6 @@ public class Attendence extends Fragment {
 
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String userId = getUserIdFromPrefs();
 
         db.collection("users")
                 .document(userId)
@@ -117,13 +130,13 @@ public class Attendence extends Fragment {
                             adapter = new TakePostAdapter(getContext(), takeList, true, "ATTEND");
                             adapter.setUserId(userId);
                             recyclerView.setAdapter(adapter);
-                            loadStudentAttendence(userId,selectedDateId);  // 학생용 데이터 불러오기
 
                             adapter.setOnStudentAppealClickListener(post -> {
                                 binding.studentAppealEditbox.setVisibility(View.VISIBLE);
                                 binding.studentAppealButton.setVisibility(View.VISIBLE);
                                 currentSelectedPost = post; // 클릭한 과목정보 저장
                             });
+
                             binding.studentAppealButton.setOnClickListener(v -> {
                                 if(currentSelectedPost == null) {
                                     Toast.makeText(getContext(), "먼저 과목을 선택하세요.", Toast.LENGTH_SHORT).show();
@@ -140,6 +153,7 @@ public class Attendence extends Fragment {
                             binding.attendenceCheckS.setVisibility(View.GONE);
                             adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
                             recyclerView.setAdapter(adapter);
+
                             loadProfessorAttendence(userId); // 교수용 데이터 불러오기
 
                             adapter.serOnProfessorClickListener(post -> {
@@ -195,9 +209,8 @@ public class Attendence extends Fragment {
         return prefs.getString("userId","");
     }
 
-    private void loadStudentAttendence(String userId,String dateId) {
+    private void loadStudentAttendence(String userId,String dateId,String weekday) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String todayWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(new Date());
         db.collection("users")
                 .document(userId)
                 .collection("takes")
@@ -211,7 +224,7 @@ public class Attendence extends Fragment {
                         String schedule = doc.getString("시간");
 
                         if (classroom != null && !"null".equals(classroom)
-                                && schedule != null && schedule.contains(todayWeekday)) {
+                                && schedule != null && schedule.contains(weekday)) {
                             TakePost takePost = new TakePost(subject, professor, classroom, schedule, "", doc.getId());
 
                             // 해당 날짜의 출결/사유 불러오기
