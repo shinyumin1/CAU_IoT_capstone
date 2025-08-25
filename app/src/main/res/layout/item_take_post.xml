@@ -8,121 +8,140 @@
     android:elevation="0dp"
     android:padding="12dp">
 
-    <LinearLayout
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/gray_box_takes"
-        android:padding="10dp">
-
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginStart="20dp"
-            android:orientation="vertical">
-
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/gray_box_takes"
+            android:orientation="vertical"
+            android:padding="10dp">
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tv_subject"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="과목명"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
+                <LinearLayout
+                android:layout_width="332dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_subject"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="과목명"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_professor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:text="교수명"
+                            android:textColor="#666"
+                            android:textSize="16sp" />
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/tv_professor"
+                    android:id="@+id/tv_classroom"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="교수명"
-                    android:textSize="16sp"
-                    android:textColor="#666"/>
+                    android:layout_marginTop="4dp"
+                    android:text="강의실"
+                    android:textColor="#666"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tv_schedule"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="시간표"
+                    android:textColor="#666"
+                    android:textSize="16sp" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tv_classroom"
+            <Button
+                android:id="@+id/btn_select_seat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="강의실"
-                android:textSize="16sp"
-                android:textColor="#666"/>
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/blue_box_small"
+                android:text="좌석 선택"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/tv_schedule"
+            <Button
+                android:id="@+id/btn_seat_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="시간표"
-                android:textSize="16sp"
-                android:textColor="#666"/>
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/blue_box_small"
+                android:text="좌석 현황"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/prof_attendence_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/blue_box_small"
+                android:text="30분/60분"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/stud_attendencd_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/blue_box_small"
+                android:text="지각"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+            <!--출석 기준 버튼 ( 스피너로 만듬 )-->
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/stand_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/blue_box_small"
+                android:entries="@array/standard_spinner"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_select_seat"
+        <TextView
+            android:id="@+id/reason_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/blue_box_small"
-            android:layout_marginEnd="20dp"
-            android:text="좌석 선택"
-            android:visibility="gone"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:layout_marginStart="10dp"
+            android:gravity="center"
+            android:text="@string/ex_reason"
+            android:visibility="gone"/>
 
-        <Button
-            android:id="@+id/btn_seat_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/blue_box_small"
-            android:layout_marginEnd="20dp"
-            android:text="좌석 현황"
-            android:visibility="gone"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
-        <Button
-            android:id="@+id/prof_attendence_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/blue_box_small"
-            android:layout_marginEnd="20dp"
-            android:text="30분/60분"
-            android:visibility="gone"
-            android:textStyle="bold"
-            android:textSize="18sp"/>
-        <Button
-            android:id="@+id/stud_attendencd_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/blue_box_small"
-            android:layout_marginEnd="20dp"
-            android:text="지각"
-            android:visibility="gone"
-            android:textStyle="bold"
-            android:textSize="18sp"/>
-        <!--출석 기준 버튼 ( 스피너로 만듬 )-->
-        <androidx.appcompat.widget.AppCompatSpinner
-            android:id="@+id/stand_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="@drawable/blue_box_small"
-            android:layout_marginEnd="20dp"
-            android:textColor="@color/white"
-            android:visibility="gone"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:entries="@array/standard_spinner"/>
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>

@@ -63,13 +63,20 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     public void setOnStudentAppealClickListener(OnstudentAppealClickListener listener){
         this.appealListener = listener;
     }
+    public interface OnprofesseorClickListener {
+        void onProfClick (TakePost post);
+    }
+    private OnprofesseorClickListener professorClickListener;
+
+    public void serOnProfessorClickListener(OnprofesseorClickListener listener){
+        this.professorClickListener = listener;
+    }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_take_post, parent, false);
         return new ViewHolder(view);
     }
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         TakePost post = takeList.get(position);
@@ -130,11 +137,11 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 holder.btnProfAttend.setVisibility(View.VISIBLE);
                 holder.standSpinner.setVisibility(View.GONE);
                 holder.btnProfAttend.setOnClickListener(v -> {
-                    Intent intent = new Intent(context, SeatStatusActivity.class);
-                    intent.putExtra("과목명", post.getSubject());
-                    intent.putExtra("시간", post.getSchedule());
-                    intent.putExtra("강의실", post.getClassroom());
-                    context.startActivity(intent);
+
+                    //버튼을 누르면 학생이 작성한 사유를 볼 수 있어야함
+                    if(professorClickListener != null) {
+                        professorClickListener.onProfClick(post);
+                    }
                 });
             }else {
                 holder.btnSeatStatus.setVisibility(View.GONE);

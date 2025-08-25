@@ -120,6 +120,42 @@ public class Attendence extends Fragment {
                             adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
                             recyclerView.setAdapter(adapter);
                             loadProfessorAttendence(userId); // 교수용 데이터 불러오기
+
+                            adapter.serOnProfessorClickListener(post -> {
+                                String dateId = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
+                                db.collectionGroup("takes")
+                                        .whereEqualTo("과목명", post.getSubject())
+                                        .get()
+                                        .addOnSuccessListener(querySnapshot -> {
+                                            StringBuilder reasons = new StringBuilder();
+                                            for (QueryDocumentSnapshot doc : querySnapshot) {
+                                                String studentId = doc.getReference().getParent().getParent().getId();
+                                                doc.getReference().collection("date").document(today)
+                                                        .get()
+                                                        .addOnSuccessListener(dateDoc -> {
+                                                            if(dateDoc.exists()) {
+                                                                String reason = dateDoc.getString("reason");
+                                                                if(reason != null && !reason.isEmpty()) {
+                                                                    reasons.append(studentId).append(": ").append(reason).append("\n");
+                                                                }
+                                                            }
+                                                            // 모든 학생 조회 후 다이얼로그 표시
+                                                            if (reasons.length() > 0) {
+                                                                new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                                                                        .setTitle(post.getSubject() + " 출결 사유")
+                                                                        .setMessage(reasons.toString())
+                                                                        .setPositiveButton("확인", null)
+                                                                        .show();
+                                                            } else {
+                                                                Toast.makeText(getContext(), "사유가 없습니다.", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(getContext(), "사유 조회 실패: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        });
+                            });
                         } else {
                             Log.e("Home", "알 수 없는 역할: " + role);
                         }
@@ -164,12 +200,31 @@ public class Attendence extends Fragment {
                     Log.e("Home", "학생 데이터 불러오기 실패: ", e);
                 });
     }
-    private void submitStudentAttendence(String userId) {
+    private void submitStudentAttendence(String appealText) {
         // text 필드 추가해서 db 넣기
+        if (currentSelectedPost == null) return ;
+        String userId = getUserIdFromPrefs();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String dateId = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
+        db.collection("users")
+                .document(userId)
+                .collection("takes")
+                .document(currentSelectedPost.getId()) //수강 과목 id
+                .collection("date")
+                .document(dateId) // 사유 . 지각한 날짜
+                .update("reason", appealText)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(getContext(), "이의신청이 제출되었습니다.", Toast.LENGTH_SHORT).show();
+                    binding.studentAppealEditbox.setVisibility(View.GONE);
+                    binding.studentAppealButton.setVisibility(View.GONE);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "제출 실패", Toast.LENGTH_SHORT).show();
+                });
     }
     private void loadProfessorAttendence(String userId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String todayWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(new Date());
+        String todayWeekday = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
         db.collection("users")
                 .document(userId)
                 .collection("lecture")
