@@ -46,17 +46,14 @@ public class Home extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        // 오늘 날짜 표시
         String today = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN).format(new Date());
         binding.todayDateTextView.setText(today);
 
         ImageView calendarButton = binding.calendarButton;
 
-
-
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new TakePostAdapter(getContext(), takeList, false, "HOME");
-        recyclerView.setAdapter(adapter);
 
         // 파이어베이스에서 take 데이터 불러오기
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -68,13 +65,25 @@ public class Home extends Fragment {
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         String role = documentSnapshot.getString("role");
+                        // 학생용 adapter
                         if ("student".equals(role)) {
-                            adapter = new TakePostAdapter(getContext(), takeList, true, "Home");
+                            takeList.clear();
+                            adapter = new TakePostAdapter(getContext(), takeList, true, "HOME");
                             recyclerView.setAdapter(adapter);
+
+                            binding.standardAttendence.setVisibility(View.GONE);
+                            binding.studentStatusButton.setVisibility(View.GONE);
+
                             loadStudentHome(userId);  // 학생용 데이터 불러오기
-                        } else if ("professor".equals(role)) {
+                        }// 교수용 adapter
+                        else if ("professor".equals(role)) {
+                            takeList.clear();
                             adapter = new TakePostAdapter(getContext(), takeList, false, "HOME");
                             recyclerView.setAdapter(adapter);
+
+                            binding.standardAttendence.setVisibility(View.VISIBLE);
+                            binding.studentStatusButton.setVisibility(View.VISIBLE);
+
                             loadProfessorHome(userId); // 교수용 데이터 불러오기
                         } else {
                             Log.e("Home", "알 수 없는 역할: " + role);

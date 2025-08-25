@@ -101,6 +101,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
             holder.btnProfAttend.setVisibility(View.GONE);
             holder.btnSeatStatus.setVisibility(View.GONE);
             holder.standSpinner.setVisibility(View.GONE);
+
             if ("HOME".equals(currentPage)) {
                 holder.btnSelectSeat.setVisibility(View.VISIBLE);
                 holder.btnStudAttend.setVisibility(View.GONE);
