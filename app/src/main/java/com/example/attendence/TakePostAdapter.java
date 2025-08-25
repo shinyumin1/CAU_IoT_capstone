@@ -25,6 +25,8 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     private boolean isStudent;
     private boolean showButtons;
     private String currentPage;
+    private String selectedDateId;
+    private String userId;
 
     public interface OnSpinnerItemSelectedListener {
         void onItemSelected(TakePost post, String selectedStandard);
@@ -36,6 +38,9 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
         this.spinnerListener = listener;
     }
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
     public TakePostAdapter(Context context, List<TakePost> takeList, boolean isStudent,  boolean showButtons,String currentPage) {
         this.context = context;
         this.takeList = takeList;
@@ -115,6 +120,30 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                         appealListener.onAppealClick(post);
                     }
                 });
+
+                // Firestore에서 출결 상태 불러오기
+                if(userId != null && !userId.isEmpty()) {
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    String dateId = (selectedDateId != null) ? selectedDateId
+                            : new java.text.SimpleDateFormat("yyMMdd", java.util.Locale.KOREAN).format(new java.util.Date());
+
+                    db.collection("users")
+                            .document(userId)
+                            .collection("takes")
+                            .document(post.getId()) // 수강 과목 id
+                            .collection("date")
+                            .document(dateId)
+                            .get()
+                            .addOnSuccessListener(document -> {
+                                if(document.exists()) {
+                                    String status = document.getString("status"); // status : 출석/결석/지각 => 출석 미인정은 추후 고려
+                                    holder.btnStudAttend.setText(status != null ? status : "미기록");
+                                } else {
+                                    holder.btnStudAttend.setText("미기록");
+                                }
+                            })
+                            .addOnFailureListener(e -> holder.btnStudAttend.setText("불러오기 실패"));
+                }
             }
 
         } else {
@@ -203,5 +232,8 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
             btnProfAttend = itemView.findViewById(R.id.prof_attendence_status);
             btnStudAttend = itemView.findViewById(R.id.stud_attendencd_status);
         }
+    }
+    public void setSelectedDate(String dateId) {
+        this.selectedDateId = dateId;
     }
 }

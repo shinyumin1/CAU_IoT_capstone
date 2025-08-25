@@ -41,6 +41,8 @@ public class Attendence extends Fragment {
     private TakePostAdapter adapter;
     private List<TakePost> takeList = new ArrayList<>();
     private TakePost currentSelectedPost;
+    private String selectedDateId = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         AttendenceViewModel AttendenceViewModel =
@@ -69,9 +71,27 @@ public class Attendence extends Fragment {
                     (view, selectedYear, selectedMonth, selectedDay) -> {
                         java.util.Calendar selectedDate = java.util.Calendar.getInstance();
                         selectedDate.set(selectedYear, selectedMonth, selectedDay);
+                        // 화면에 보이는 날짜
                         String formattedDate = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN)
                                 .format(selectedDate.getTime());
                         binding.todayDateTextView.setText(formattedDate);
+
+                        // Firebase 문서 id용 (yyMMdd 형식)
+                        selectedDateId = new SimpleDateFormat("yyMMdd",Locale.KOREAN).format(selectedDate.getTime());
+
+                        // EditText와 버튼 초기화
+                        binding.etStudentAppeal.setText(""); // 사유 초기화
+                        binding.studentAppealEditbox.setVisibility(View.GONE);
+                        binding.studentAppealButton.setVisibility(View.GONE);
+                        currentSelectedPost = null; // 선택된 과목 초기화
+
+                        // 어댑터에 전달
+                        adapter.setSelectedDate(selectedDateId);
+                        adapter.notifyDataSetChanged();
+
+                        // 선택된 날짜 기준으로 데이터 다시 불러오기
+                        String userId = getUserIdFromPrefs();
+                        loadStudentAttendence(userId, selectedDateId);
                     },
                     year, month, day
             );
@@ -95,8 +115,9 @@ public class Attendence extends Fragment {
                                 Toast.makeText(getContext(), "출결 이의 신청 클릭됨", Toast.LENGTH_SHORT).show();
                             });
                             adapter = new TakePostAdapter(getContext(), takeList, true, "ATTEND");
+                            adapter.setUserId(userId);
                             recyclerView.setAdapter(adapter);
-                            loadStudentAttendence(userId);  // 학생용 데이터 불러오기
+                            loadStudentAttendence(userId,selectedDateId);  // 학생용 데이터 불러오기
 
                             adapter.setOnStudentAppealClickListener(post -> {
                                 binding.studentAppealEditbox.setVisibility(View.VISIBLE);
@@ -113,7 +134,7 @@ public class Attendence extends Fragment {
                                     Toast.makeText(getContext(), "사유를 입력해주세요.", Toast.LENGTH_SHORT).show();
                                     return;
                                 }
-                                submitStudentAttendence(appealText);
+                                submitStudentAttendence(appealText, selectedDateId);
                             });
                         } else if ("professor".equals(role)) {
                             binding.attendenceCheckS.setVisibility(View.GONE);
@@ -174,7 +195,7 @@ public class Attendence extends Fragment {
         return prefs.getString("userId","");
     }
 
-    private void loadStudentAttendence(String userId) {
+    private void loadStudentAttendence(String userId,String dateId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String todayWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(new Date());
         db.collection("users")
@@ -191,7 +212,26 @@ public class Attendence extends Fragment {
 
                         if (classroom != null && !"null".equals(classroom)
                                 && schedule != null && schedule.contains(todayWeekday)) {
-                            takeList.add(new TakePost(subject, professor, classroom, schedule, "", doc.getId()));
+                            TakePost takePost = new TakePost(subject, professor, classroom, schedule, "", doc.getId());
+
+                            // 해당 날짜의 출결/사유 불러오기
+                            db.collection("users")
+                                    .document(userId)
+                                    .collection("takes")
+                                    .document(doc.getId())
+                                    .collection("date")
+                                    .document(dateId)
+                                    .get()
+                                    .addOnSuccessListener(dateDoc -> {
+                                        if (dateDoc.exists()) {
+                                            String reason = dateDoc.getString("reason");
+                                            String status = dateDoc.getString("status"); // 출결 상태
+                                            takePost.setAttendenceStandard(status != null ? status : "");
+                                        }
+                                        adapter.notifyDataSetChanged();
+                                    });
+
+                            takeList.add(takePost);
                         }
                     }
                     adapter.notifyDataSetChanged();
@@ -200,12 +240,11 @@ public class Attendence extends Fragment {
                     Log.e("Home", "학생 데이터 불러오기 실패: ", e);
                 });
     }
-    private void submitStudentAttendence(String appealText) {
+    private void submitStudentAttendence(String appealText, String dateId) {
         // text 필드 추가해서 db 넣기
         if (currentSelectedPost == null) return ;
         String userId = getUserIdFromPrefs();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String dateId = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
         db.collection("users")
                 .document(userId)
                 .collection("takes")
