@@ -223,11 +223,11 @@ public class Attendence extends Fragment {
                         String professor = doc.getString("교수명");
                         String classroom = doc.getString("강의실");
                         String schedule = doc.getString("시간");
-                        String profId = doc.getString("professorId");
 
                         if (classroom != null && !"null".equals(classroom)
                                 && schedule != null && schedule.contains(weekday)) {
-                            TakePost takePost = new TakePost(subject, professor, classroom, schedule, "", doc.getId(), profId!=null?profId:"");
+                            String profId = (currentSelectedPost != null) ? currentSelectedPost.getProfId() : "";
+                            TakePost takePost = new TakePost(subject, professor, classroom, schedule, "", doc.getId(), profId);
 
                             // 해당 날짜의 출결/사유 불러오기
                             db.collection("users")
@@ -318,7 +318,8 @@ public class Attendence extends Fragment {
                         String schedule = doc.getString("시간");
 
                         if (schedule != null && schedule.contains(todayWeekday)) {
-                            takeList.add(new TakePost(subject, " ", classroom, schedule,"",doc.getId(), currentSelectedPost.getProfId()));
+                            String profId = (currentSelectedPost != null) ? currentSelectedPost.getProfId() : "";
+                            takeList.add(new TakePost(subject, " ", classroom, schedule,"",doc.getId(), profId));
                         }
                     }
                     adapter.notifyDataSetChanged();
