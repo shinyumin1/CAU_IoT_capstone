@@ -122,6 +122,8 @@ public class SelectSeatActivity extends AppCompatActivity{
 
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // 학생 본인 데이터 저장
         HashMap<String, Object> seatData = new HashMap<>();
         seatData.put("seat", seatName);
 
@@ -134,8 +136,42 @@ public class SelectSeatActivity extends AppCompatActivity{
                 .set(seatData, SetOptions.merge()) // merge: 기존 필드는 유지, seat만 업데이트
                 .addOnSuccessListener(aVoid -> Toast.makeText(this, "좌석이 저장되었습니다: " + seatName, Toast.LENGTH_SHORT).show())
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "좌석 저장 실패", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "학생 좌석 저장 실패", Toast.LENGTH_SHORT).show();
                     Log.e("SelectSeat", "Firestore 저장 실패", e);
+                });
+
+        // 교수 DB 에도 좌석 동기화
+        // 교수 ID, Lecture Id를 takes 문서에서 불러오기
+        db.collection("users")
+                .document(userId)
+                .collection("takes")
+                .document(takeId)
+                .get()
+                .addOnSuccessListener(snapshot->{
+                    if (snapshot.exists()){
+                        String professorId=snapshot.getString("professorId");
+                        String lectureId=snapshot.getString("lectureId");
+
+                        Log.d("SelectSeat", "professorId=" + professorId + ", lectureId=" + lectureId);
+
+                        if (professorId!=null&&lectureId!=null){
+                            HashMap<String,Object> professorSeatData=new HashMap<>();
+                            professorSeatData.put("studentId",userId);
+                            professorSeatData.put("seat",seatName);
+
+                            db.collection("users")
+                                    .document(professorId)
+                                    .collection("lecture")
+                                    .document(lectureId)
+                                    .collection("date")
+                                    .document(dateId)
+                                    .collection("seats")
+                                    .document(userId)
+                                    .set(professorSeatData,SetOptions.merge())
+                                    .addOnSuccessListener(aVoid -> Log.d("SelectSeat", "교수 seat 업데이트 성공"))
+                                    .addOnFailureListener(e -> Log.e("SelectSeat", "교수 seat 업데이트 실패", e));
+                        }
+                    }
                 });
 
     }

@@ -79,6 +79,7 @@ public class Home extends Fragment {
                         else if ("professor".equals(role)) {
                             takeList.clear();
                             adapter = new TakePostAdapter(getContext(), takeList, false, "HOME");
+                            adapter.setUserId(userId);
                             recyclerView.setAdapter(adapter);
 
                             binding.standardAttendence.setVisibility(View.VISIBLE);

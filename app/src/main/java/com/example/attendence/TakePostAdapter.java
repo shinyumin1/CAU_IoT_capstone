@@ -173,6 +173,8 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                     intent.putExtra("과목명", post.getSubject());
                     intent.putExtra("시간", post.getSchedule());
                     intent.putExtra("강의실", post.getClassroom());
+                    intent.putExtra("professorId",userId);
+                    intent.putExtra("lectureId",post.getId());
                     context.startActivity(intent);
                 });
             } else if ("ATTEND".equals(currentPage)) {
