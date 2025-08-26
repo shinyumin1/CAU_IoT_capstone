@@ -8,6 +8,7 @@ public class TakePost {
     private String classroom;
     private String schedule;
     private String attendenceStandard;
+    private String reason;
     //화면에 따라 버튼이 달라지도록
     public TakePost() {} // Firestore 직렬화용
 
@@ -40,6 +41,8 @@ public class TakePost {
     public void setAttendenceStandard(String attendenceStandard) {
         this.attendenceStandard = attendenceStandard;
     }
+    public  String getReason() {return reason;}
+    public void setReason(String reason) {this.reason = reason;}
     public String getProfId() { return profId; }
     public void setProfessorId(String profId) { this.profId = profId; }
 }

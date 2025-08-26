@@ -91,6 +91,8 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
         holder.professor.setText(post.getProfessor());
         holder.classroom.setText(post.getClassroom());
         holder.schedule.setText(post.getSchedule());
+        holder.reasonText.setText(post.getReason());
+
 
         if (!showButtons) {
             holder.btnSelectSeat.setVisibility(View.GONE);
@@ -98,11 +100,13 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
             holder.btnProfAttend.setVisibility(View.GONE);
             holder.btnStudAttend.setVisibility(View.GONE);
             holder.standSpinner.setVisibility(View.GONE);
+            holder.reasonText.setVisibility(View.GONE);
 
         } else if (isStudent) {
             holder.btnProfAttend.setVisibility(View.GONE);
             holder.btnSeatStatus.setVisibility(View.GONE);
             holder.standSpinner.setVisibility(View.GONE);
+            holder.reasonText.setVisibility(View.GONE);
 
             if ("HOME".equals(currentPage)) {
                 holder.btnSelectSeat.setVisibility(View.VISIBLE);
@@ -163,6 +167,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 holder.btnSeatStatus.setVisibility(View.VISIBLE);
                 holder.btnProfAttend.setVisibility(View.GONE);
                 holder.standSpinner.setVisibility(View.GONE);
+                holder.reasonText.setVisibility(View.GONE);
                 holder.btnSeatStatus.setOnClickListener(v -> {
                     Intent intent = new Intent(context, SeatStatusActivity.class);
                     intent.putExtra("과목명", post.getSubject());
@@ -174,6 +179,13 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 holder.btnSeatStatus.setVisibility(View.GONE);
                 holder.btnProfAttend.setVisibility(View.VISIBLE);
                 holder.standSpinner.setVisibility(View.GONE);
+                holder.itemView.setOnClickListener(v ->  {
+                    if(holder.reasonText.getVisibility()  ==  View.GONE) {
+                        holder.reasonText.setVisibility(View.GONE);
+                    } else {
+                        holder.reasonText.setVisibility(View.GONE);
+                    }
+                });
                 holder.btnProfAttend.setOnClickListener(v -> {
 
                     //버튼을 누르면 학생이 작성한 사유를 볼 수 있어야함
@@ -225,7 +237,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView subject, professor,classroom,schedule;
+        TextView subject, professor,classroom,schedule, reasonText;
         Button btnSelectSeat, btnSeatStatus, btnProfAttend, btnStudAttend;
         Spinner standSpinner;
 
@@ -240,6 +252,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
             standSpinner = itemView.findViewById(R.id.stand_spinner);
             btnProfAttend = itemView.findViewById(R.id.prof_attendence_status);
             btnStudAttend = itemView.findViewById(R.id.stud_attendencd_status);
+            reasonText  = itemView.findViewById(R.id.reason_text);
         }
     }
     public void setSelectedDate(String dateId) {
