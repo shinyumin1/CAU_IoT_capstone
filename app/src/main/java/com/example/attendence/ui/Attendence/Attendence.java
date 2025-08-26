@@ -155,42 +155,38 @@ public class Attendence extends Fragment {
                             adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
                             recyclerView.setAdapter(adapter);
 
-                            loadProfessorAttendence(userId); // 교수용 데이터 불러오기
+                            loadProfessorAttendence(userId,selectedDateId); // 교수용 데이터 불러오기
 
                             adapter.serOnProfessorClickListener(post -> {
                                 String dateId = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
-                                db.collectionGroup("takes")
-                                        .whereEqualTo("과목명", post.getSubject())
+                                db.collection("users")
+                                        .document(userId)
+                                        .collection("lecture")
+                                        .document(post.getId())
+                                        .collection("date")
+                                        .document(dateId)
+                                        .collection("attendence")
                                         .get()
                                         .addOnSuccessListener(querySnapshot -> {
                                             StringBuilder reasons = new StringBuilder();
                                             for (QueryDocumentSnapshot doc : querySnapshot) {
-                                                String studentId = doc.getReference().getParent().getParent().getId();
-                                                doc.getReference().collection("date").document(today)
-                                                        .get()
-                                                        .addOnSuccessListener(dateDoc -> {
-                                                            if(dateDoc.exists()) {
-                                                                String reason = dateDoc.getString("reason");
-                                                                if(reason != null && !reason.isEmpty()) {
-                                                                    reasons.append(studentId).append(": ").append(reason).append("\n");
-                                                                }
-                                                            }
-                                                            // 모든 학생 조회 후 다이얼로그 표시
-                                                            if (reasons.length() > 0) {
-                                                                new androidx.appcompat.app.AlertDialog.Builder(getContext())
-                                                                        .setTitle(post.getSubject() + " 출결 사유")
-                                                                        .setMessage(reasons.toString())
-                                                                        .setPositiveButton("확인", null)
-                                                                        .show();
-                                                            } else {
-                                                                Toast.makeText(getContext(), "사유가 없습니다.", Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        });
+                                                String studentId = doc.getId();
+                                                String reason = doc.getString("reason");
+                                                if(reason != null && !reason.isEmpty()) {
+                                                    reasons.append(studentId).append(": ").append(reason).append("\n");
+                                                }
+                                            }
+                                            if(reasons.length() > 0) {
+                                                new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                                                        .setTitle(post.getSubject() + " 출결 사유")
+                                                        .setMessage(reasons.toString())
+                                                        .setPositiveButton("확인", null)
+                                                        .show();
+                                            } else {
+                                                Toast.makeText(getContext(), "사유가 없습니다.", Toast.LENGTH_SHORT).show();
                                             }
                                         })
-                                        .addOnFailureListener(e -> {
-                                            Toast.makeText(getContext(), "사유 조회 실패: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                        });
+                                        .addOnFailureListener(e -> Toast.makeText(getContext(), "사유 조회 실패: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                             });
                         } else {
                             Log.e("Home", "알 수 없는 역할: " + role);
@@ -306,7 +302,7 @@ public class Attendence extends Fragment {
                 });
 
     }
-    private void loadProfessorAttendence(String userId) {
+    private void loadProfessorAttendence(String userId, String dateId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String todayWeekday = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
         db.collection("users")
@@ -319,18 +315,39 @@ public class Attendence extends Fragment {
                         String subject = doc.getString("과목명");
                         String classroom = doc.getString("강의실");
                         String schedule = doc.getString("시간");
-
                         if (schedule != null && schedule.contains(todayWeekday)) {
                             String profId = (currentSelectedPost != null) ? currentSelectedPost.getProfId() : "";
-                            takeList.add(new TakePost(subject, " ", classroom, schedule,"",doc.getId(), profId));
+                            TakePost takePost = new TakePost(subject, " ", classroom, schedule, "", doc.getId(), profId);
+                            takeList.add(takePost);
+                            //takeList.add(new TakePost(subject, " ", classroom, schedule, "", doc.getId(), profId));
+                            db.collection("users")
+                                    .document(userId)
+                                    .collection("lecture")
+                                    .document(doc.getId())
+                                    .collection("date")
+                                    .document(dateId)
+                                    .collection("attendance")
+                                    .get()
+                                    .addOnSuccessListener(querySnapshot -> {
+                                        HashMap<String, String> studentReasons = new HashMap<>();
+                                        for (QueryDocumentSnapshot studentDoc : querySnapshot) {
+                                            String studentId = studentDoc.getId();
+                                            String reason = studentDoc.getString("reason");
+                                            if (reason != null && !reason.isEmpty()) {
+                                                studentReasons.put(studentId, reason);
+                                            }
+                                        }
+                                        takePost.setStudentReasons(studentReasons);
+                                        adapter.notifyDataSetChanged();
+                                    });
+                            }
+
                         }
-                    }
-                    adapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Home", "교수 데이터 불러오기 실패: ", e);
-                });
-    }
+                        adapter.notifyDataSetChanged();
+                    })
+                    .addOnFailureListener(e -> Log.e("Home", "교수 데이터 불러오기 실패: ", e));
+                }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();

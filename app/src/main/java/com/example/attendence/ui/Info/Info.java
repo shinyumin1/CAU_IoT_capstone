@@ -147,6 +147,7 @@ public class Info extends Fragment {
                         String classroom = doc.getString("강의실");
                         String schedule = doc.getString("시간");
 
+
                         if (subject != null && classroom != null && schedule != null) {
                             String docId = doc.getId();
                             String profId = doc.getString("professorId");
@@ -173,6 +174,7 @@ public class Info extends Fragment {
                         String classroom = doc.getString("강의실");
                         String schedule = doc.getString("시간");
                         String attendenceStandard = doc.getString("출석기준");
+                        String reason = doc.getString("reson");
 
                         if (subject != null && classroom != null && schedule != null) {
                             String docId = doc.getId();

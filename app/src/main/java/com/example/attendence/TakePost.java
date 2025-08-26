@@ -1,5 +1,7 @@
 package com.example.attendence;
 
+import java.util.HashMap;
+
 public class TakePost {
     private String id ;
     private String subject;
@@ -9,10 +11,13 @@ public class TakePost {
     private String schedule;
     private String attendenceStandard;
     private String reason;
+    //학생별 사유 추가
+    private HashMap<String, String> studentReasons;
     //화면에 따라 버튼이 달라지도록
     public TakePost() {} // Firestore 직렬화용
 
-    public TakePost(String subject, String professor,String classroom,String schedule,String attendenceStandard,String id,String ProfId) {
+    public TakePost(String subject, String professor, String classroom, String schedule,
+                    String attendenceStandard, String id, String profId) {
         this.id = id;
         this.subject = subject;
         this.professor = professor;
@@ -20,6 +25,7 @@ public class TakePost {
         this.classroom = classroom;
         this.schedule = schedule;
         this.attendenceStandard = attendenceStandard;
+        this.studentReasons = new HashMap<>();
     }
     public String getId() {return id;}
     public void setId(String id) { this.id = id;}
@@ -42,7 +48,10 @@ public class TakePost {
         this.attendenceStandard = attendenceStandard;
     }
     public  String getReason() {return reason;}
+
     public void setReason(String reason) {this.reason = reason;}
     public String getProfId() { return profId; }
     public void setProfessorId(String profId) { this.profId = profId; }
+    public HashMap<String, String> getStudentReasons() { return studentReasons; }
+    public void setStudentReasons(HashMap<String, String> reasons) { this.studentReasons = reasons; }
 }

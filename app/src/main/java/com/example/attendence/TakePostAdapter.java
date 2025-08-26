@@ -188,7 +188,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 });
                 holder.btnProfAttend.setOnClickListener(v -> {
 
-                    //버튼을 누르면 학생이 작성한 사유를 볼 수 있어야함
+                    //출석/ 지각/ 결석 변경해줄건지에 대한 spinner 로변경해야함
                     if(professorClickListener != null) {
                         professorClickListener.onProfClick(post);
                     }
