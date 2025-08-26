@@ -1,5 +1,6 @@
 package com.example.attendence;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -107,11 +108,17 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 holder.btnStudAttend.setVisibility(View.GONE);
                 holder.btnSelectSeat.setOnClickListener(v -> {
                     Intent intent = new Intent(context, SelectSeatActivity.class);
+                    intent.putExtra("takeId", post.getId());
                     intent.putExtra("과목명", post.getSubject());
                     intent.putExtra("교수명", post.getProfessor());
                     intent.putExtra("강의실", post.getClassroom());
                     intent.putExtra("시간", post.getSchedule());
-                    context.startActivity(intent);
+                    if (context instanceof Activity) {
+                        ((Activity) context).startActivity(intent);
+                    } else {
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    }
                 });
             } else if("ATTEND".equals(currentPage)) {
                 holder.btnSelectSeat.setVisibility(View.GONE);

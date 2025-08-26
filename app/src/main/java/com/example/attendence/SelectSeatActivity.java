@@ -1,6 +1,7 @@
 package com.example.attendence;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.ImageButton;
@@ -8,16 +9,41 @@ import android.graphics.PorterDuff;
 import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.HashMap;
+
 
 public class SelectSeatActivity extends AppCompatActivity{
     private ImageButton selectedSeat = null;
+    private String userId;
+    private String takeId;
+
 
     @Override
-    protected void onCreate(Bundle saveInstanceState){
+    protected void onCreate(Bundle saveInstanceState) {
         super.onCreate(saveInstanceState);
         setContentView(R.layout.activity_select_seat);
 
         TextView tvClassInfo = findViewById(R.id.tv_class_info);
+
+        // SharedPreferences에서 userId 가져오기
+        userId = getSharedPreferences("UserPrefs", MODE_PRIVATE).getString("userId", null);
+
+        // 이전 화면에서 takeId 전달받기
+        takeId = getIntent().getStringExtra("takeId");
+        if (takeId == null) {
+            Toast.makeText(this, "수강 정보가 없습니다.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
 
         String subject = getIntent().getStringExtra("과목명");
         String professor = getIntent().getStringExtra("교수명");
@@ -48,19 +74,27 @@ public class SelectSeatActivity extends AppCompatActivity{
             seat.setOnClickListener(v -> handleSeatClick((ImageButton) v));
         }
 
+        // firebase에서 기존 좌석 가져오기
+        loadSeatFromFirestore();
+
         Button doneButton = findViewById(R.id.btn_done_select_seat);
-        doneButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 홈 화면(MainActivity)로 이동
-                Intent intent = new Intent(SelectSeatActivity.this, MainActivity.class);
-                intent.putExtra("selected_seat_id", selectedSeat != null ? selectedSeat.getId() : -1); // 선택된 좌석 id 전달 (선택 안 했으면 -1)
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP); // 기존 MainActivity 재사용
-                startActivity(intent);
-                finish(); // 현재 액티비티 종료
+        doneButton.setOnClickListener(v -> {
+            if (selectedSeat == null) {
+                Toast.makeText(this, "좌석을 선택해주세요!", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            String seatName = getSeatName(selectedSeat);
+            saveSeatToFirestore(seatName);
+
+            Intent intent = new Intent(SelectSeatActivity.this, MainActivity.class);
+            intent.putExtra("selected_seat_id", selectedSeat != null ? selectedSeat.getId() : -1);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish();
         });
     }
+
 
     private void handleSeatClick(ImageButton clickedSeat) {
         // 이전 선택한 좌석 원래 상태로
@@ -70,8 +104,74 @@ public class SelectSeatActivity extends AppCompatActivity{
 
         // 현재 클릭한 좌석을 파란색으로
         clickedSeat.setColorFilter(getResources().getColor(R.color.blue, null), PorterDuff.Mode.SRC_IN);
-
         selectedSeat = clickedSeat;
+
+    }
+
+    private String getSeatName(ImageButton seat) {
+        String resName = getResources().getResourceEntryName(seat.getId());
+        return resName.substring(resName.indexOf("_") + 1); // seat_a1 → a1
+    }
+
+    private void saveSeatToFirestore(String seatName) {
+        if(userId == null || takeId == null) return;
+
+        String dateId = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
+
+        Log.d("SelectSeat", "userId=" + userId + ", takeId=" + takeId + ", dateId=" + dateId + ", seat=" + seatName);
+
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        HashMap<String, Object> seatData = new HashMap<>();
+        seatData.put("seat", seatName);
+
+        db.collection("users")
+                .document(userId)
+                .collection("takes")
+                .document(takeId)
+                .collection("date")
+                .document(dateId)
+                .set(seatData, SetOptions.merge()) // merge: 기존 필드는 유지, seat만 업데이트
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "좌석이 저장되었습니다: " + seatName, Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "좌석 저장 실패", Toast.LENGTH_SHORT).show();
+                    Log.e("SelectSeat", "Firestore 저장 실패", e);
+                });
+
+    }
+
+    private void loadSeatFromFirestore(){
+        if (userId == null || takeId == null) return ;
+
+        String dateId = new SimpleDateFormat("yyMMdd",Locale.KOREAN).format(new Date());
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users")
+                .document(userId)
+                .collection("takes")
+                .document(takeId)
+                .collection("date")
+                .document(dateId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()){
+                        String savedSeat = documentSnapshot.getString("seat");
+                        if (savedSeat != null){
+                            // seatName -> 버튼 ID 찾기
+                            int resId = getResources().getIdentifier("seat_"+savedSeat, "id",getPackageName());
+
+                            if (resId != 0) {
+                                ImageButton seatBtn = findViewById(resId);
+                                if (seatBtn != null) {
+                                    seatBtn.setColorFilter(getResources().getColor(R.color.blue, null),
+                                            PorterDuff.Mode.SRC_IN);
+                                    selectedSeat = seatBtn;
+                                }
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("SelectSeat", "좌석 불러오기 실패", e));
     }
 }
 
