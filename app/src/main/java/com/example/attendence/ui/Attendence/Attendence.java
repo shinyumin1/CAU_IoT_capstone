@@ -33,6 +33,7 @@ import com.example.attendence.databinding.FragmentAttendenceBinding;
 import com.example.attendence.databinding.FragmentHomeBinding;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 
 public class Attendence extends Fragment {
@@ -55,17 +56,24 @@ public class Attendence extends Fragment {
         // 오늘 날짜 표시
         String today = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN).format(new Date());
         binding.todayDateTextView.setText(today);
+        // 사용자 ID 가져오기
+        String userId = getUserIdFromPrefs();
 
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
+        adapter = new TakePostAdapter(getContext(), takeList, true, "ATTEND");
+        adapter.setUserId(userId);
+        adapter.setOnStudentAppealClickListener(post -> {
+            binding.studentAppealEditbox.setVisibility(View.VISIBLE);
+            binding.studentAppealButton.setVisibility(View.VISIBLE);
+            currentSelectedPost = post; // 클릭한 과목정보 저장
+        });
         recyclerView.setAdapter(adapter);
 
         // 오늘 요일 계산
         String todayWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(new Date());
 
-        // 사용자 ID 가져오기
-        String userId = getUserIdFromPrefs();
+
 
         // 초기 학생 데이터 불러오기
         loadStudentAttendence(userId, selectedDateId, todayWeekday);
@@ -128,15 +136,6 @@ public class Attendence extends Fragment {
                                 // 추후 구현해야 하는 부분.. 현재는 토스트만 띄우게 설정
                                 Toast.makeText(getContext(), "출결 이의 신청 클릭됨", Toast.LENGTH_SHORT).show();
                             });
-                            adapter = new TakePostAdapter(getContext(), takeList, true, "ATTEND");
-                            adapter.setUserId(userId);
-                            recyclerView.setAdapter(adapter);
-
-                            adapter.setOnStudentAppealClickListener(post -> {
-                                binding.studentAppealEditbox.setVisibility(View.VISIBLE);
-                                binding.studentAppealButton.setVisibility(View.VISIBLE);
-                                currentSelectedPost = post; // 클릭한 과목정보 저장
-                            });
 
                             binding.studentAppealButton.setOnClickListener(v -> {
                                 if(currentSelectedPost == null) {
@@ -149,6 +148,7 @@ public class Attendence extends Fragment {
                                     return;
                                 }
                                 submitStudentAttendence(appealText, selectedDateId);
+                                Toast.makeText(getContext(), "출석 이의신청되었습니다.",Toast.LENGTH_SHORT).show();
                             });
                         } else if ("professor".equals(role)) {
                             binding.attendenceCheckS.setVisibility(View.GONE);
@@ -271,11 +271,12 @@ public class Attendence extends Fragment {
                                 .document(currentSelectedPost.getId()) //수강 과목 id
                                 .collection("date")
                                 .document(dateId) // 사유 . 지각한 날짜
-                                .update("reason", appealText)
+                                .set(new HashMap<String, Object>() {{
+                                    put("reason", appealText);
+                                }}, SetOptions.merge())
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(getContext(), "이의신청이 제출되었습니다.", Toast.LENGTH_SHORT).show();
-                                    binding.studentAppealEditbox.setVisibility(View.GONE);
-                                    binding.studentAppealButton.setVisibility(View.GONE);
+
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(getContext(), "제출 실패", Toast.LENGTH_SHORT).show();
@@ -292,7 +293,9 @@ public class Attendence extends Fragment {
                                     .document(studentId)
                                     .set(new HashMap<String, Object>() {{
                                         put("reason", appealText); // 필요시 출결 상태도 같이 저장
-                                    }});
+                                    }}, SetOptions.merge())
+                                    .addOnSuccessListener(aVoid -> Log.d("Submit", "Professor DB updated"))
+                                    .addOnFailureListener(e -> Log.e("Submit", "Professor DB failed", e));
                         }
                     } else {
                         Toast.makeText(getContext(), "학생 계정이 아닙니다",Toast.LENGTH_SHORT).show();
