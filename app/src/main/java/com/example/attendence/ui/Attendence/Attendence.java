@@ -299,44 +299,28 @@ public class Attendence extends Fragment {
                                 doc.getId(),
                                 userId
                         );
-                        takeList.add(takePost);
-                    }
-                    adapter.notifyDataSetChanged();
-
-                    // 클릭 리스너
-                    adapter.serOnProfessorClickListener(post -> {
                         db.collection("users")
                                 .document(userId)
                                 .collection("lecture")
-                                .document(post.getId())
+                                .document(doc.getId())
                                 .collection("date")
-                                .document(selectedDateId)
+                                .document(dateId)
                                 .collection("attendance")
                                 .get()
-                                .addOnSuccessListener(querySnapshot -> {
-                                    StringBuilder reasons = new StringBuilder();
-                                    for (QueryDocumentSnapshot studentDoc : querySnapshot) {
+                                .addOnSuccessListener(studentSnapshots -> {
+                                    for(QueryDocumentSnapshot studentDoc : studentSnapshots){
                                         String studentId = studentDoc.getId();
                                         String reason = studentDoc.getString("reason");
                                         if (reason != null && !reason.isEmpty()) {
-                                            reasons.append(studentId).append(": ").append(reason).append("\n");
+                                            takePost.setStudentId(studentId);
+                                            takePost.getStudentReasons().put(studentId,reason);
                                         }
                                     }
-
-                                    if (reasons.length() > 0) {
-                                        new androidx.appcompat.app.AlertDialog.Builder(getContext())
-                                                .setTitle(post.getSubject() + " 출결 사유")
-                                                .setMessage(reasons.toString())
-                                                .setPositiveButton("확인", null)
-                                                .show();
-                                    } else {
-                                        Toast.makeText(getContext(), "사유가 없습니다.", Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .addOnFailureListener(e ->
-                                        Toast.makeText(getContext(), "사유 조회 실패: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                                );
-                    });
+                                    takeList.add(takePost);
+                                    adapter.notifyDataSetChanged();
+                                });
+                    }
+                    adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> Log.e("Attendence", "교수 데이터 불러오기 실패: ", e));
     }

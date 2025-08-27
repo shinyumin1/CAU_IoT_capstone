@@ -63,8 +63,10 @@
         android:id="@+id/reason_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="20dp"
         android:gravity="center"
+        android:textSize="15sp"
+        android:textStyle="bold"
         android:text="@string/ex_reason"
         android:visibility="gone" />
 </LinearLayout>

@@ -3,6 +3,7 @@ package com.example.attendence;
 import java.util.HashMap;
 
 public class TakePost {
+    private String studentId; // 학생
     private String id ;
     private String subject;
     private String professor;
@@ -10,7 +11,6 @@ public class TakePost {
     private String classroom;
     private String schedule;
     private String attendenceStandard;
-    private String reason;
     //학생별 사유 추가
     private HashMap<String, String> studentReasons;
     //화면에 따라 버튼이 달라지도록
@@ -26,6 +26,10 @@ public class TakePost {
         this.schedule = schedule;
         this.attendenceStandard = attendenceStandard;
         this.studentReasons = new HashMap<>();
+    }
+    public String getStudentId() {return studentId;}
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
     }
     public String getId() {return id;}
     public void setId(String id) { this.id = id;}
@@ -47,9 +51,6 @@ public class TakePost {
     public void setAttendenceStandard(String attendenceStandard) {
         this.attendenceStandard = attendenceStandard;
     }
-    public  String getReason() {return reason;}
-
-    public void setReason(String reason) {this.reason = reason;}
     public String getProfId() { return profId; }
     public void setProfessorId(String profId) { this.profId = profId; }
     public HashMap<String, String> getStudentReasons() { return studentReasons; }

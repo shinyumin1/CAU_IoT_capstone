@@ -18,7 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHolder> {
 
@@ -91,7 +93,21 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
         holder.professor.setText(post.getProfessor());
         holder.classroom.setText(post.getClassroom());
         holder.schedule.setText(post.getSchedule());
-        holder.reasonText.setText(post.getReason());
+        //학생별 사유
+        HashMap<String, String> reasonsMap = post.getStudentReasons();
+        StringBuilder reasonsBuilder = new StringBuilder();
+
+        if (reasonsMap != null && !reasonsMap.isEmpty()) {
+            for (Map.Entry<String, String> entry : reasonsMap.entrySet()) {
+                reasonsBuilder
+                        .append(entry.getValue())
+                        .append("\n");
+            }
+            holder.reasonText.setText(reasonsBuilder.toString());
+        } else {
+            holder.reasonText.setText("사유 없음");
+        }
+
 
 
         if (!showButtons) {
@@ -183,7 +199,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 holder.standSpinner.setVisibility(View.GONE);
                 holder.itemView.setOnClickListener(v ->  {
                     if(holder.reasonText.getVisibility()  ==  View.GONE) {
-                        holder.reasonText.setVisibility(View.GONE);
+                        holder.reasonText.setVisibility(View.VISIBLE);
                     } else {
                         holder.reasonText.setVisibility(View.GONE);
                     }
