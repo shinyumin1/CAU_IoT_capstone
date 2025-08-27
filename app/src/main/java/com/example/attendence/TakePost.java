@@ -11,8 +11,8 @@ public class TakePost {
     private String classroom;
     private String schedule;
     private String attendenceStandard;
-    //학생별 사유 추가
-    private HashMap<String, String> studentReasons;
+    // 사유 추가
+    private String studentReasons;
     //화면에 따라 버튼이 달라지도록
     public TakePost() {} // Firestore 직렬화용
 
@@ -25,7 +25,7 @@ public class TakePost {
         this.classroom = classroom;
         this.schedule = schedule;
         this.attendenceStandard = attendenceStandard;
-        this.studentReasons = new HashMap<>();
+        this.studentReasons = "";
     }
     public String getStudentId() {return studentId;}
     public void setStudentId(String studentId) {
@@ -53,6 +53,6 @@ public class TakePost {
     }
     public String getProfId() { return profId; }
     public void setProfessorId(String profId) { this.profId = profId; }
-    public HashMap<String, String> getStudentReasons() { return studentReasons; }
-    public void setStudentReasons(HashMap<String, String> reasons) { this.studentReasons = reasons; }
+    public String getStudentReasons() { return studentReasons; }
+    public void setStudentReasons(String studentReasons) { this.studentReasons = studentReasons; }
 }

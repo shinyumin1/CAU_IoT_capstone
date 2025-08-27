@@ -290,15 +290,10 @@ public class Attendence extends Fragment {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     takeList.clear();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        TakePost takePost = new TakePost(
-                                doc.getString("과목명"),
-                                " ",
-                                doc.getString("강의실"),
-                                doc.getString("시간"),
-                                "",
-                                doc.getId(),
-                                userId
-                        );
+                        String subject = doc.getString("과목명");
+                        String classroom = doc.getString("강의실");
+                        String schedule = doc.getString("시간");
+                        String lectureId = doc.getId();
                         db.collection("users")
                                 .document(userId)
                                 .collection("lecture")
@@ -312,11 +307,20 @@ public class Attendence extends Fragment {
                                         String studentId = studentDoc.getId();
                                         String reason = studentDoc.getString("reason");
                                         if (reason != null && !reason.isEmpty()) {
+                                            TakePost takePost = new TakePost(
+                                                    subject,
+                                                    " ",  // 교수 이름 필요 시 수정
+                                                    classroom,
+                                                    schedule,
+                                                    "", // attendenceStandard 필요 시 추가
+                                                    lectureId,
+                                                    userId
+                                            );
                                             takePost.setStudentId(studentId);
-                                            takePost.getStudentReasons().put(studentId,reason);
+                                            takePost.setStudentReasons(reason);
+                                            takeList.add(takePost);
                                         }
                                     }
-                                    takeList.add(takePost);
                                     adapter.notifyDataSetChanged();
                                 });
                     }

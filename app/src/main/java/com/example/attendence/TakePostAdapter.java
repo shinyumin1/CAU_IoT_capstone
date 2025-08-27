@@ -94,20 +94,14 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
         holder.classroom.setText(post.getClassroom());
         holder.schedule.setText(post.getSchedule());
         //학생별 사유
-        HashMap<String, String> reasonsMap = post.getStudentReasons();
-        StringBuilder reasonsBuilder = new StringBuilder();
+        String studentId = post.getStudentId();
+        String reason = post.getStudentReasons();
 
-        if (reasonsMap != null && !reasonsMap.isEmpty()) {
-            for (Map.Entry<String, String> entry : reasonsMap.entrySet()) {
-                reasonsBuilder
-                        .append(entry.getValue())
-                        .append("\n");
-            }
-            holder.reasonText.setText(reasonsBuilder.toString());
+        if (reason != null && !reason.isEmpty()) {
+            holder.reasonText.setText(studentId + " : " + reason);
         } else {
             holder.reasonText.setText("사유 없음");
         }
-
 
 
         if (!showButtons) {
