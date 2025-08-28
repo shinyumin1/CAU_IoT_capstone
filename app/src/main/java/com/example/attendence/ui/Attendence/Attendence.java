@@ -1,5 +1,6 @@
 package com.example.attendence.ui.Attendence;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.attendence.BluetoothService;
 import com.example.attendence.R;
 import com.example.attendence.TakePost;
 import com.example.attendence.TakePostAdapter;
@@ -29,7 +31,7 @@ import com.example.attendence.databinding.FragmentAttendenceBinding;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
-
+//해당페이지에서 블루투스 통신으로 데이터 연결
 public class Attendence extends Fragment {
 
     private FragmentAttendenceBinding binding;
@@ -39,7 +41,9 @@ public class Attendence extends Fragment {
     private TakePost currentSelectedPost;
     private String selectedDateId = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
     private String userId;
-
+    //블루투스 통신
+    private BluetoothAdapter bluetoothAdapter;
+    private BluetoothService bluetoothService;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -69,8 +73,12 @@ public class Attendence extends Fragment {
         // 달력 버튼
         binding.calendarButton.setVisibility(View.VISIBLE);
         binding.calendarButton.setOnClickListener(v -> showDatePicker());
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        //블루투스 연동
+        bluetoothService = new BluetoothService();
+        bluetoothService.setOnDataReceivedListener(btData ->{
+            requireActivity().runOnUiThread(() -> handleBluetoothData(btData));
+        });
 
         // 사용자 role 확인
         db.collection("users")
@@ -93,6 +101,29 @@ public class Attendence extends Fragment {
                 .addOnFailureListener(e -> Log.e("Attendence", "사용자 role 가져오기 실패: ", e));
 
         return root;
+    }
+    private void handleBluetoothData(String btData){
+        String[] parts = btData.split("/");
+        if (parts.length == 3){
+            String schedule = parts[0].trim();  // 요일
+            String time = parts[1].trim(); // 시간
+            String status = parts[2].trim(); // 출석 / 결석 / 지각
+
+            getActivity().runOnUiThread(() -> {
+                adapter.updateStudentStatus(schedule, time, status);
+                int pos =-1;
+                for (int i = 0; i < takeList.size(); i++) {
+                    TakePost p = takeList.get(i);
+                    if (p.getSchedule().equals(schedule)) {
+                        pos = i;
+                        break;
+                    }
+                }
+                if (pos != -1) {
+                    adapter.notifyItemChanged(pos);
+                }
+            });
+        }
     }
 
     private void setupStudentUI() {
@@ -119,7 +150,7 @@ public class Attendence extends Fragment {
     }
 
     private void setupProfessorUI() {
-        binding.attendenceCheckS.setVisibility(View.GONE);
+        //binding.attendenceCheckS.setVisibility(View.GONE);
         adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
         recyclerView.setAdapter(adapter);
 
@@ -209,12 +240,14 @@ public class Attendence extends Fragment {
 
     private void loadStudentAttendence(String userId, String dateId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
         db.collection("users")
                 .document(userId)
                 .collection("takes")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     takeList.clear();
+
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         String subject = doc.getString("과목명");
                         String professor = doc.getString("교수명");
@@ -223,8 +256,9 @@ public class Attendence extends Fragment {
 
                         TakePost takePost = new TakePost(subject, professor, classroom, schedule, "", doc.getId(), doc.getString("professorId"));
                         takeList.add(takePost);
+                        int position = takeList.size() - 1; // 현재 아이템 위치
 
-                        // 출결/사유 불러오기
+                        // Firestore에서 학생 출결 상태 가져오기
                         db.collection("users")
                                 .document(userId)
                                 .collection("takes")
@@ -233,15 +267,30 @@ public class Attendence extends Fragment {
                                 .document(dateId)
                                 .get()
                                 .addOnSuccessListener(dateDoc -> {
+                                    String status = "미기록";
                                     if (dateDoc.exists()) {
-                                        takePost.setAttendenceStandard(dateDoc.getString("status") != null ? dateDoc.getString("status") : "");
+                                        String dbStatus = dateDoc.getString("status");
+                                        if (dbStatus != null && !dbStatus.isEmpty()) {
+                                            status = dbStatus;
+                                        }
                                     }
-                                    adapter.notifyDataSetChanged();
+                                    // TakePost에 상태 반영
+                                    takePost.setStudentAttendenceStatus(status);
+                                    // 현재 시간도 반영
+                                    takePost.setCurrentTime(new SimpleDateFormat("HH:mm", Locale.KOREAN).format(new Date()));
+                                    // 해당 아이템만 갱신
+                                    adapter.notifyItemChanged(position);
+                                })
+                                .addOnFailureListener(e -> {
+                                    takePost.setStudentAttendenceStatus("불러오기 실패");
+                                    takePost.setCurrentTime(new SimpleDateFormat("HH:mm", Locale.KOREAN).format(new Date()));
+                                    adapter.notifyItemChanged(position);
                                 });
                     }
-                    adapter.notifyDataSetChanged();
-                });
+                })
+                .addOnFailureListener(e -> Log.e("Attendence", "학생 데이터 불러오기 실패: ", e));
     }
+
 
     private void submitStudentAttendence(String appealText, String dateId) {
         if (currentSelectedPost == null) return;

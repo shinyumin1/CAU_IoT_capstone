@@ -13,7 +13,10 @@ public class TakePost {
     private String attendenceStandard;
     // 사유 추가
     private String studentReasons;
-    //화면에 따라 버튼이 달라지도록
+    //학생에서 자신의 출결 상태를 볼 수 있도록함
+    private String studentAttendenceStatus;
+    //실시간 시간
+    private String currentTime;
     public TakePost() {} // Firestore 직렬화용
 
     public TakePost(String subject, String professor, String classroom, String schedule,
@@ -26,6 +29,8 @@ public class TakePost {
         this.schedule = schedule;
         this.attendenceStandard = attendenceStandard;
         this.studentReasons = "";
+        this.studentAttendenceStatus="아직없음";
+
     }
     public String getStudentId() {return studentId;}
     public void setStudentId(String studentId) {
@@ -55,4 +60,16 @@ public class TakePost {
     public void setProfessorId(String profId) { this.profId = profId; }
     public String getStudentReasons() { return studentReasons; }
     public void setStudentReasons(String studentReasons) { this.studentReasons = studentReasons; }
+
+
+    public String getStudentAttendenceStatus() {
+        return studentAttendenceStatus;
+    }
+
+    public void setStudentAttendenceStatus(String studentAttendenceStatus) {
+        this.studentAttendenceStatus = studentAttendenceStatus;
+    }
+
+    public String getCurrentTime() { return currentTime; }
+    public void setCurrentTime(String currentTime) { this.currentTime = currentTime; }
 }

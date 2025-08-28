@@ -116,7 +116,7 @@
                 android:text="지각"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:visibility="gone" />
+                android:visibility="gone"/>
             <!--출석 기준 버튼 ( 스피너로 만듬 )-->
             <androidx.appcompat.widget.AppCompatSpinner
                 android:id="@+id/stand_spinner"

@@ -25,5 +25,11 @@
         <item>10분</item>
         <item>0분</item>
     </string-array>
+    <!--출석현황 변경spinner item-->
+    <string-array name="student_attendence_status">
+        <item>지각</item>
+        <item>결석</item>
+        <item>출석</item>
+    </string-array>
 
 </resources>

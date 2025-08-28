@@ -80,6 +80,19 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     public void serOnProfessorClickListener(OnprofesseorClickListener listener){
         this.professorClickListener = listener;
     }
+    public void updateStudentStatus(String schedule, String time, String status) {
+        for (int i = 0; i < takeList.size(); i++) {
+            TakePost post = takeList.get(i);
+            if (post.getSchedule().equals(schedule)) { // 요일/시간 비교
+                post.setCurrentTime(time);
+                post.setStudentAttendenceStatus(status);
+                //notifyItemChanged(i);
+                break;
+            }
+        }
+    }
+
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -101,8 +114,8 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
             holder.reasonText.setText(studentId + " : " + reason);
         } else {
             holder.reasonText.setText("사유 없음");
-        }
 
+        }
 
         if (!showButtons) {
             holder.btnSelectSeat.setVisibility(View.GONE);
@@ -137,35 +150,46 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 });
             } else if("ATTEND".equals(currentPage)) {
                 holder.btnSelectSeat.setVisibility(View.GONE);
-                holder.btnStudAttend.setVisibility(View.VISIBLE);
-                holder.btnStudAttend.setOnClickListener(v -> {
-                    if(appealListener != null) {
-                        appealListener.onAppealClick(post);
+
+                if(post.getStudentAttendenceStatus() != null && !post.getStudentAttendenceStatus().isEmpty()) {
+                    holder.btnStudAttend.setVisibility(View.VISIBLE);
+                    holder.btnStudAttend.setText(
+                            post.getStudentAttendenceStatus() +
+                                    " \n( " + post.getCurrentTime()+")"
+                    );
+
+                } else {
+                    // Firestore에서 출결 상태 불러오기
+                    if(userId != null && !userId.isEmpty()) {
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        String dateId = (selectedDateId != null) ? selectedDateId
+                                : new java.text.SimpleDateFormat("yyMMdd", java.util.Locale.KOREAN).format(new java.util.Date());
+
+                        db.collection("users")
+                                .document(userId)
+                                .collection("takes")
+                                .document(post.getId()) // 수강 과목 id
+                                .collection("date")
+                                .document(dateId)
+                                .get()
+                                .addOnSuccessListener(document -> {
+                                    String status = "미기록";
+                                    if(document.exists()) {
+                                        String dbStatus = document.getString("status"); // status : 출석/결석/지각 => 출석 미인정은 추후 고려
+                                        if(dbStatus != null && !dbStatus.isEmpty()) {
+                                            status = dbStatus;
+                                        }
+                                    }
+                                    post.setStudentAttendenceStatus(status);
+                                    holder.btnStudAttend.setText(status + "\n(" + post.getCurrentTime() + ")");
+                                    holder.btnStudAttend.setVisibility(View.VISIBLE);
+                                })
+                                .addOnFailureListener(e -> {
+                                    holder.btnStudAttend.setText("불러오기 실패");
+                                    holder.btnStudAttend.setVisibility(View.VISIBLE);
+                                });
+
                     }
-                });
-
-                // Firestore에서 출결 상태 불러오기
-                if(userId != null && !userId.isEmpty()) {
-                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-                    String dateId = (selectedDateId != null) ? selectedDateId
-                            : new java.text.SimpleDateFormat("yyMMdd", java.util.Locale.KOREAN).format(new java.util.Date());
-
-                    db.collection("users")
-                            .document(userId)
-                            .collection("takes")
-                            .document(post.getId()) // 수강 과목 id
-                            .collection("date")
-                            .document(dateId)
-                            .get()
-                            .addOnSuccessListener(document -> {
-                                if(document.exists()) {
-                                    String status = document.getString("status"); // status : 출석/결석/지각 => 출석 미인정은 추후 고려
-                                    holder.btnStudAttend.setText(status != null ? status : "미기록");
-                                } else {
-                                    holder.btnStudAttend.setText("미기록");
-                                }
-                            })
-                            .addOnFailureListener(e -> holder.btnStudAttend.setText("불러오기 실패"));
                 }
             }
 
