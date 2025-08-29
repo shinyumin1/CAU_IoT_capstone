@@ -1,7 +1,10 @@
 package com.example.attendence.ui.Attendence;
 
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,6 +34,7 @@ import com.example.attendence.TakePostAdapter;
 import com.example.attendence.databinding.FragmentAttendenceBinding;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.ServerTimestamp;
 import com.google.firebase.firestore.SetOptions;
 //해당페이지에서 블루투스 통신으로 데이터 연결
 public class Attendence extends Fragment {
@@ -75,11 +80,15 @@ public class Attendence extends Fragment {
         binding.calendarButton.setOnClickListener(v -> showDatePicker());
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         //블루투스 연동
-        bluetoothService = new BluetoothService();
-        bluetoothService.setOnDataReceivedListener(btData ->{
-            requireActivity().runOnUiThread(() -> handleBluetoothData(btData));
-        });
-
+        /****
+         *
+         * bluetoothService = new BluetoothService();
+         *         bluetoothService.setOnDataReceivedListener(btData ->{
+         *             requireActivity().runOnUiThread(() -> handleBluetoothData(btData));
+         *         });
+         * **/
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(btReceiver,
+                new IntentFilter("BT_DATA_RECEIVED"));
         // 사용자 role 확인
         db.collection("users")
                 .document(userId)
@@ -102,6 +111,21 @@ public class Attendence extends Fragment {
 
         return root;
     }
+    private final BroadcastReceiver btReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+           String data = intent.getStringExtra("bt_data");
+           if (data != null) {
+               String[] parts = data.split("/");
+               if(parts.length >= 3) {
+                   String  date = parts[0]; //요일
+                   String time = parts[1]; // 시간
+                   String status = parts[2]; // 출결
+                   adapter.updateStudentStatus(date, time, status);
+               }
+           }
+        }
+    };
     private void handleBluetoothData(String btData){
         String[] parts = btData.split("/");
         if (parts.length == 3){

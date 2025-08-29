@@ -2,7 +2,10 @@ package com.example.attendence;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.util.Log;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -69,4 +72,10 @@ public class BluetoothService {
             }
         }
     }
+    private void sendDataToUI(String data) {
+        Intent intent = new Intent("BT_DATA_RECEIVED");
+        intent.putExtra("bt_data", data);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
 }

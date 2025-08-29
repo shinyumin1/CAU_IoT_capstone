@@ -80,13 +80,13 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     public void serOnProfessorClickListener(OnprofesseorClickListener listener){
         this.professorClickListener = listener;
     }
-    public void updateStudentStatus(String schedule, String time, String status) {
+    public void updateStudentStatus(String date, String time, String status) {
         for (int i = 0; i < takeList.size(); i++) {
             TakePost post = takeList.get(i);
-            if (post.getSchedule().equals(schedule)) { // 요일/시간 비교
+            if (post.getSchedule() !=null && post.getSchedule().contains(date)) { // 요일/시간 비교
                 post.setCurrentTime(time);
                 post.setStudentAttendenceStatus(status);
-                //notifyItemChanged(i);
+                notifyItemChanged(i);
                 break;
             }
         }
