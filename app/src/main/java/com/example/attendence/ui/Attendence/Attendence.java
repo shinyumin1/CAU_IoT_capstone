@@ -56,7 +56,7 @@ public class Attendence extends Fragment {
         View root = binding.getRoot();
 
         // 오늘 날짜 표시
-        String today = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN).format(new Date());
+        String today = new SimpleDateFormat("yyyy-MM-dd(E)", Locale.KOREAN).format(new Date());
         binding.todayDateTextView.setText(today);
 
         // 사용자 ID 가져오기
@@ -227,7 +227,7 @@ public class Attendence extends Fragment {
                     java.util.Calendar selectedDate = java.util.Calendar.getInstance();
                     selectedDate.set(selectedYear, selectedMonth, selectedDay);
 
-                    String formattedDate = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN)
+                    String formattedDate = new SimpleDateFormat("yyyy-MM-dd(E)", Locale.KOREAN)
                             .format(selectedDate.getTime());
                     binding.todayDateTextView.setText(formattedDate);
 

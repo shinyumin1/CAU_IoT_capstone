@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
@@ -55,18 +56,15 @@ public class SelectSeatActivity extends AppCompatActivity{
 
 
         int[] seatIds = {
-                R.id.seat_a1, R.id.seat_a2, R.id.seat_a3,
-                R.id.seat_a4, R.id.seat_a5, R.id.seat_a6,
-                R.id.seat_b1, R.id.seat_b2, R.id.seat_b3,
-                R.id.seat_b4, R.id.seat_b5, R.id.seat_b6,
-                R.id.seat_c1, R.id.seat_c2, R.id.seat_c3,
-                R.id.seat_c4, R.id.seat_c5, R.id.seat_c6,
-                R.id.seat_d1, R.id.seat_d2, R.id.seat_d3,
-                R.id.seat_d4, R.id.seat_d5, R.id.seat_d6,
-                R.id.seat_e1, R.id.seat_e2, R.id.seat_e3,
-                R.id.seat_e4, R.id.seat_e5, R.id.seat_e6,
-                R.id.seat_f1, R.id.seat_f2, R.id.seat_f3,
-                R.id.seat_f4, R.id.seat_f5, R.id.seat_f6,
+                R.id.seat_a1, R.id.seat_a2, R.id.seat_a3, R.id.seat_a4, R.id.seat_a5, R.id.seat_a6,
+                R.id.seat_b1, R.id.seat_b2, R.id.seat_b3, R.id.seat_b4, R.id.seat_b5, R.id.seat_b6,
+                R.id.seat_c1, R.id.seat_c2, R.id.seat_c3, R.id.seat_c4, R.id.seat_c5, R.id.seat_c6,
+                R.id.seat_d1, R.id.seat_d2, R.id.seat_d3, R.id.seat_d4, R.id.seat_d5, R.id.seat_d6,
+                R.id.seat_e1, R.id.seat_e2, R.id.seat_e3, R.id.seat_e4, R.id.seat_e5, R.id.seat_e6,
+                R.id.seat_f1, R.id.seat_f2, R.id.seat_f3, R.id.seat_f4, R.id.seat_f5, R.id.seat_f6,
+                R.id.seat_g1, R.id.seat_g2, R.id.seat_g3, R.id.seat_g4, R.id.seat_g5, R.id.seat_g6,
+                R.id.seat_h1, R.id.seat_h2, R.id.seat_h3, R.id.seat_h4, R.id.seat_h5, R.id.seat_h6,
+                R.id.seat_i1, R.id.seat_i2, R.id.seat_i3, R.id.seat_i4, R.id.seat_i5, R.id.seat_i6
         };
 
         for (int id : seatIds) {
@@ -182,6 +180,8 @@ public class SelectSeatActivity extends AppCompatActivity{
         String dateId = new SimpleDateFormat("yyMMdd",Locale.KOREAN).format(new Date());
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // 본인 좌석 가져오기
         db.collection("users")
                 .document(userId)
                 .collection("takes")
@@ -190,22 +190,66 @@ public class SelectSeatActivity extends AppCompatActivity{
                 .document(dateId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()){
-                        String savedSeat = documentSnapshot.getString("seat");
-                        if (savedSeat != null){
-                            // seatName -> 버튼 ID 찾기
-                            int resId = getResources().getIdentifier("seat_"+savedSeat, "id",getPackageName());
+                    String mySeatTemp = null;
+                    if (documentSnapshot.exists()) {
+                        mySeatTemp = documentSnapshot.getString("seat");
+                    }
 
-                            if (resId != 0) {
-                                ImageButton seatBtn = findViewById(resId);
-                                if (seatBtn != null) {
-                                    seatBtn.setColorFilter(getResources().getColor(R.color.blue, null),
-                                            PorterDuff.Mode.SRC_IN);
-                                    selectedSeat = seatBtn;
-                                }
-                            }
+                    final String mySeat = mySeatTemp;
+
+                    if (mySeat != null) {
+                        int resId = getResources().getIdentifier("seat_" + mySeat, "id", getPackageName());
+                        ImageButton seatBtn = findViewById(resId);
+                        if (mySeat != null && mySeat.equals(mySeat)) {
+                            seatBtn.setColorFilter(getResources().getColor(R.color.blue, null), PorterDuff.Mode.SRC_IN);
+                            selectedSeat = seatBtn;
+                        }
+                        else {
+                            seatBtn.setColorFilter(getResources().getColor(R.color.red, null), PorterDuff.Mode.SRC_IN);
                         }
                     }
+
+
+                    // 교수 db에서 모든 좌석 가져오기(선택된 좌석은 빨간색으로 표시)
+                    String professorId = getIntent().getStringExtra("professorId");
+                    String lectureId = getIntent().getStringExtra("lectureId");
+                    if (professorId == null || lectureId == null) return;
+
+                    db.collection("users")
+                            .document(professorId)
+                            .collection("lecture")
+                            .document(lectureId)
+                            .collection("date")
+                            .document(dateId)
+                            .collection("seats")
+                            .get()
+                            .addOnSuccessListener(querySnapshot -> {
+                                for (DocumentSnapshot doc : querySnapshot) {
+                                    String seatName = doc.getString("seat");
+                                    String studentId = doc.getString("studentId");
+
+                                    Log.d("SelectSeat", "좌석 확인: seatName=" + seatName + ", studentId=" + studentId + ", mySeat=" + mySeat);
+
+
+                                    if (seatName != null) {
+                                        int resId = getResources().getIdentifier("seat_" + seatName, "id", getPackageName());
+                                        Log.d("SelectSeat", "resId=" + resId);
+                                        ImageButton seatBtn = findViewById(resId);
+                                        if (seatBtn != null) {
+                                            if (mySeat != null && mySeat.equals(seatName)) {
+                                                seatBtn.setColorFilter(getResources().getColor(R.color.blue, null),
+                                                        PorterDuff.Mode.SRC_IN);
+                                                selectedSeat = seatBtn;
+                                                Log.d("SelectSeat", "내 좌석: " + seatName + " → 파란색");
+                                            } else {
+                                                seatBtn.setColorFilter(getResources().getColor(R.color.red, null),
+                                                        PorterDuff.Mode.SRC_IN);
+                                                Log.d("SelectSeat", "다른 학생 좌석: " + seatName + " → 빨간색");
+                                            }
+                                        }
+                                    }
+                                }
+                            });
                 })
                 .addOnFailureListener(e -> Log.e("SelectSeat", "좌석 불러오기 실패", e));
     }

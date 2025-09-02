@@ -13,8 +13,10 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingTop="20dp"
-        android:paddingStart="20dp">
+        android:paddingStart="20dp"
+        android:paddingTop="30dp"
+        tools:layout_editor_absoluteX="36dp"
+        tools:layout_editor_absoluteY="8dp">
 
         <TextView
             android:id="@+id/todayDateTextView"
@@ -23,6 +25,7 @@
             android:text="2025년 08월 06일 수요일"
             android:textColor="@color/black"
             android:textSize="18sp"
+            android:paddingStart="10dp"
             android:textStyle="bold" />
 
         <ImageView
@@ -32,7 +35,7 @@
             android:layout_marginStart="8dp"
             android:contentDescription="달력"
             android:src="@drawable/uil_calender"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/attendence_check_s"
@@ -42,8 +45,8 @@
             android:background="@drawable/attend_appeal_blue_box"
             android:text="출결 이의 신청"
             android:textSize="13dp"
-            android:visibility="gone"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
 
     </LinearLayout>
 

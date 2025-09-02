@@ -47,7 +47,7 @@ public class Home extends Fragment {
         View root = binding.getRoot();
 
         // 오늘 날짜 표시
-        String today = new SimpleDateFormat("yyyy년 MM월 dd일 E요일", Locale.KOREAN).format(new Date());
+        String today = new SimpleDateFormat("yyyy-MM-dd(E)", Locale.KOREAN).format(new Date());
         binding.todayDateTextView.setText(today);
 
         ImageView calendarButton = binding.calendarButton;

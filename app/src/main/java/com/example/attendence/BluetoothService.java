@@ -75,7 +75,7 @@ public class BluetoothService {
     private void sendDataToUI(String data) {
         Intent intent = new Intent("BT_DATA_RECEIVED");
         intent.putExtra("bt_data", data);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        //LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
 }

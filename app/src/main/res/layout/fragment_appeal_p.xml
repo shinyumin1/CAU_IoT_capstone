@@ -5,32 +5,32 @@
     android:layout_height="match_parent"
     tools:context=".appealS">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="top|start">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="결석: 0~40%"
-            android:textStyle="bold"
-            android:textSize="12sp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="지각: 41~70%"
-            android:textStyle="bold"
-            android:textSize="12sp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="출석: 71~100%"
-            android:textStyle="bold"
-            android:textSize="12sp"/>
-    </LinearLayout>
+<!--    <LinearLayout-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="vertical"-->
+<!--        android:layout_marginStart="20dp"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        android:layout_gravity="top|start">-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="결석: 0~40%"-->
+<!--            android:textStyle="bold"-->
+<!--            android:textSize="12sp"/>-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="지각: 41~70%"-->
+<!--            android:textStyle="bold"-->
+<!--            android:textSize="12sp"/>-->
+<!--        <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="출석: 71~100%"-->
+<!--            android:textStyle="bold"-->
+<!--            android:textSize="12sp"/>-->
+<!--    </LinearLayout>-->
     <!--리사이클러뷰-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_p"

@@ -3,6 +3,7 @@ package com.example.attendence;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,8 +25,12 @@ public class SeatStatusActivity extends AppCompatActivity {
             R.id.seat_c1, R.id.seat_c2, R.id.seat_c3, R.id.seat_c4, R.id.seat_c5, R.id.seat_c6,
             R.id.seat_d1, R.id.seat_d2, R.id.seat_d3, R.id.seat_d4, R.id.seat_d5, R.id.seat_d6,
             R.id.seat_e1, R.id.seat_e2, R.id.seat_e3, R.id.seat_e4, R.id.seat_e5, R.id.seat_e6,
-            R.id.seat_f1, R.id.seat_f2, R.id.seat_f3, R.id.seat_f4, R.id.seat_f5, R.id.seat_f6
+            R.id.seat_f1, R.id.seat_f2, R.id.seat_f3, R.id.seat_f4, R.id.seat_f5, R.id.seat_f6,
+            R.id.seat_g1, R.id.seat_g2, R.id.seat_g3, R.id.seat_g4, R.id.seat_g5, R.id.seat_g6,
+            R.id.seat_h1, R.id.seat_h2, R.id.seat_h3, R.id.seat_h4, R.id.seat_h5, R.id.seat_h6,
+            R.id.seat_i1, R.id.seat_i2, R.id.seat_i3, R.id.seat_i4, R.id.seat_i5, R.id.seat_i6
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,17 @@ public class SeatStatusActivity extends AppCompatActivity {
             return;
         }
 
+        // 강의 정보
+        TextView tvClassInfo = findViewById(R.id.tv_class_info);
+
+        String subject = getIntent().getStringExtra("과목명");
+        String classroom = getIntent().getStringExtra("강의실");
+        String schedule = getIntent().getStringExtra("시간");
+
+        if (subject != null && classroom != null && schedule != null) {
+            String infoText = subject + " " + classroom + "\n" + schedule;
+            tvClassInfo.setText(infoText);
+        }
 
         // firebase에서 좌석 현황 불러오기
         loadSeatsForProfessor(professorId, lectureId);
