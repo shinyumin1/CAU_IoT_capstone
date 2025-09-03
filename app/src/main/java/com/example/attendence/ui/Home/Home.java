@@ -55,6 +55,8 @@ public class Home extends Fragment {
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        adapter = new TakePostAdapter(getContext(),takeList, false, false,"");
+        recyclerView.setAdapter(adapter);
         // 파이어베이스에서 take 데이터 불러오기
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         String userId = getUserIdFromPrefs();
@@ -82,8 +84,10 @@ public class Home extends Fragment {
                             adapter.setUserId(userId);
                             recyclerView.setAdapter(adapter);
 
-                            binding.standardAttendence.setVisibility(View.VISIBLE);
-                            binding.studentStatusButton.setVisibility(View.VISIBLE);
+                            if (binding != null) {
+                                binding.standardAttendence.setVisibility(View.VISIBLE);
+                                binding.studentStatusButton.setVisibility(View.VISIBLE);
+                            }
 
                             loadProfessorHome(userId); // 교수용 데이터 불러오기
                         } else {

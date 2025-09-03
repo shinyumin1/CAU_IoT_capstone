@@ -3,6 +3,7 @@ package com.example.attendence;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -245,6 +249,25 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                         if(spinnerListener != null){
                             spinnerListener.onItemSelected(post, selected);
                         }
+                        //학생쪽으로 반영할 수있도록
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        String studentId = post.getStudentId();
+                        String takeId = post.getId();
+                        if(studentId !=null &&  takeId !=null){
+                            db.collection("users")
+                                    .document(studentId)
+                                    .collection("takes")
+                                    .document(takeId)
+                                    .collection("date")
+                                    .document(selectedDateId)
+                                    .update("status", selected)
+                                    .addOnSuccessListener(aVoid->{
+                                        Log.d("교수님 출결현황","학생 출결 기준 업데이트 성공:" + selected);
+                                    })
+                                    .addOnFailureListener(e->{
+                                        Log.w("교수님 출결 현황", "학생 출결 기준 업데이트 실패" ,e);
+                                    });
+                        }
                     }
 
                     @Override
@@ -278,6 +301,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                         if (spinnerListener != null) {
                             spinnerListener.onItemSelected(post, selected);
                         }
+
                     }
 
                     @Override
@@ -288,7 +312,6 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
             }
         }
     }
-
     @Override
     public int getItemCount() {
         return takeList.size();
