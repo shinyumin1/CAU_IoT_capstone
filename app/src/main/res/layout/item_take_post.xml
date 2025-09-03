@@ -93,14 +93,15 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
-
-            <Button
-                android:id="@+id/prof_attendence_status"
+                <!--교수님 측에서 출결현황에 대한 spinner-->
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/prof_attend_status_spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginEnd="20dp"
                 android:background="@drawable/blue_box_small"
+                android:entries="@array/attend_status_spinner"
                 android:text="30분/60분"
                 android:textSize="18sp"
                 android:textStyle="bold"
