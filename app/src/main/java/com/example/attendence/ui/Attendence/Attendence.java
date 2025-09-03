@@ -97,8 +97,14 @@ public class Attendence extends Fragment {
                     if (documentSnapshot.exists()) {
                         String role = documentSnapshot.getString("role");
                         if ("student".equals(role)) {
+                            binding.standardAttendence.setVisibility(View.GONE);
+                            binding.studentStatusButton.setVisibility(View.GONE);
                             setupStudentUI();
                         } else if ("professor".equals(role)) {
+                            if (binding != null) {
+                                binding.standardAttendence.setVisibility(View.VISIBLE);
+                                binding.studentStatusButton.setVisibility(View.VISIBLE);
+                            }
                             setupProfessorUI();
                         } else {
                             Log.e("Attendence", "알 수 없는 역할: " + role);

@@ -73,9 +73,6 @@ public class Home extends Fragment {
                             adapter = new TakePostAdapter(getContext(), takeList, true, "HOME");
                             recyclerView.setAdapter(adapter);
 
-                            binding.standardAttendence.setVisibility(View.GONE);
-                            binding.studentStatusButton.setVisibility(View.GONE);
-
                             loadStudentHome(userId);  // 학생용 데이터 불러오기
                         }// 교수용 adapter
                         else if ("professor".equals(role)) {
@@ -84,10 +81,6 @@ public class Home extends Fragment {
                             adapter.setUserId(userId);
                             recyclerView.setAdapter(adapter);
 
-                            if (binding != null) {
-                                binding.standardAttendence.setVisibility(View.VISIBLE);
-                                binding.studentStatusButton.setVisibility(View.VISIBLE);
-                            }
 
                             loadProfessorHome(userId); // 교수용 데이터 불러오기
                         } else {
