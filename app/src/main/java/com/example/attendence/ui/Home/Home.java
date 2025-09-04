@@ -55,7 +55,7 @@ public class Home extends Fragment {
         recyclerView = binding.rvTakePosts;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new TakePostAdapter(getContext(),takeList, false, false,"");
+        adapter = new TakePostAdapter(getContext(),takeList, false, false,"HOME");
         recyclerView.setAdapter(adapter);
         // 파이어베이스에서 take 데이터 불러오기
         FirebaseFirestore db = FirebaseFirestore.getInstance();
