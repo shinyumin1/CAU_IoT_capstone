@@ -57,11 +57,7 @@ public class Attendence extends Fragment {
         adapter.setUserId(userId);
         recyclerView.setAdapter(adapter);
 
-        adapter.setOnStudentAppealClickListener(post -> {
-            binding.studentAppealEditbox.setVisibility(View.VISIBLE);
-            binding.studentAppealButton.setVisibility(View.VISIBLE);
-            currentSelectedPost = post;
-        });
+
 
         // 달력 버튼
         binding.calendarButton.setVisibility(View.VISIBLE);
@@ -106,7 +102,11 @@ public class Attendence extends Fragment {
         binding.attendenceCheckS.setOnClickListener(v ->
                 Toast.makeText(getContext(), "출결 이의 신청 클릭됨", Toast.LENGTH_SHORT).show()
         );
-
+        adapter.setOnStudentAppealClickListener(post -> {
+            binding.studentAppealEditbox.setVisibility(View.VISIBLE);
+            binding.studentAppealButton.setVisibility(View.VISIBLE);
+            currentSelectedPost = post;
+        });
         binding.studentAppealButton.setOnClickListener(v -> {
             if (currentSelectedPost == null) {
                 Toast.makeText(getContext(), "먼저 과목을 선택하세요.", Toast.LENGTH_SHORT).show();
@@ -187,8 +187,8 @@ public class Attendence extends Fragment {
                     selectedDateId = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(selectedDate.getTime());
 
                     binding.etStudentAppeal.setText("");
-                    binding.studentAppealEditbox.setVisibility(View.GONE);
-                    binding.studentAppealButton.setVisibility(View.GONE);
+                    //binding.studentAppealEditbox.setVisibility(View.GONE);
+                    //binding.studentAppealButton.setVisibility(View.GONE);
                     currentSelectedPost = null;
 
                     adapter.setSelectedDate(selectedDateId);

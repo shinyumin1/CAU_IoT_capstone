@@ -161,6 +161,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                             post.getStudentAttendenceStatus() +
                                     " \n( " + post.getCurrentTime()+")"
                     );
+                    //btnStudAttend을클릭하면 사유를 적을 수 있는 칸이랑. 버튼이 나오도록
 
                 } else {
                     // Firestore에서 출결 상태 불러오기
@@ -195,6 +196,11 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
 
                     }
                 }
+                holder.btnStudAttend.setOnClickListener(v -> {
+                    if (appealListener != null) {
+                        appealListener.onAppealClick(post);  // Fragment에서 등록한 리스너 호출
+                    }
+                });
             }
 
         } else {
