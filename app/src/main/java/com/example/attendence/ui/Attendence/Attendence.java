@@ -46,9 +46,6 @@ public class Attendence extends Fragment {
     private TakePost currentSelectedPost;
     private String selectedDateId = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
     private String userId;
-    //블루투스 통신
-    private BluetoothAdapter bluetoothAdapter;
-    private BluetoothService bluetoothService;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -79,16 +76,7 @@ public class Attendence extends Fragment {
         binding.calendarButton.setVisibility(View.VISIBLE);
         binding.calendarButton.setOnClickListener(v -> showDatePicker());
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        //블루투스 연동
-        /****
-         *
-         * bluetoothService = new BluetoothService();
-         *         bluetoothService.setOnDataReceivedListener(btData ->{
-         *             requireActivity().runOnUiThread(() -> handleBluetoothData(btData));
-         *         });
-         * **/
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(btReceiver,
-                new IntentFilter("BT_DATA_RECEIVED"));
+
         // 사용자 role 확인
         db.collection("users")
                 .document(userId)
@@ -117,44 +105,8 @@ public class Attendence extends Fragment {
 
         return root;
     }
-    private final BroadcastReceiver btReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-           String data = intent.getStringExtra("bt_data");
-           if (data != null) {
-               String[] parts = data.split("/");
-               if(parts.length >= 3) {
-                   String  date = parts[0]; //요일
-                   String time = parts[1]; // 시간
-                   String status = parts[2]; // 출결
-                   adapter.updateStudentStatus(date, time, status);
-               }
-           }
-        }
-    };
-    private void handleBluetoothData(String btData){
-        String[] parts = btData.split("/");
-        if (parts.length == 3){
-            String schedule = parts[0].trim();  // 요일
-            String time = parts[1].trim(); // 시간
-            String status = parts[2].trim(); // 출석 / 결석 / 지각
 
-            getActivity().runOnUiThread(() -> {
-                adapter.updateStudentStatus(schedule, time, status);
-                int pos =-1;
-                for (int i = 0; i < takeList.size(); i++) {
-                    TakePost p = takeList.get(i);
-                    if (p.getSchedule().equals(schedule)) {
-                        pos = i;
-                        break;
-                    }
-                }
-                if (pos != -1) {
-                    adapter.notifyItemChanged(pos);
-                }
-            });
-        }
-    }
+
 
     private void setupStudentUI() {
         adapter = new TakePostAdapter(getContext(), takeList, true, "ATTEND");
@@ -363,6 +315,7 @@ public class Attendence extends Fragment {
     }
 
     private void loadProfessorAttendence(String userId, String dateId) {
+       String todayWeekday = new  SimpleDateFormat("E", Locale.KOREAN).format(new Date());
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users")
                 .document(userId)
@@ -374,40 +327,44 @@ public class Attendence extends Fragment {
                         String subject = doc.getString("과목명");
                         String classroom = doc.getString("강의실");
                         String schedule = doc.getString("시간");
-                        String lectureId = doc.getId();
-                        db.collection("users")
-                                .document(userId)
-                                .collection("lecture")
-                                .document(doc.getId())
-                                .collection("date")
-                                .document(dateId)
-                                .collection("attendance")
-                                .get()
-                                .addOnSuccessListener(studentSnapshots -> {
-                                    for(QueryDocumentSnapshot studentDoc : studentSnapshots){
-                                        String studentId = studentDoc.getId();
-                                        String reason = studentDoc.getString("reason");
-                                        if (reason != null && !reason.isEmpty()) {
-                                            TakePost takePost = new TakePost(
-                                                    subject,
-                                                    " ",  // 교수 이름 필요 시 수정
-                                                    classroom,
-                                                    schedule,
-                                                    "", // attendenceStandard 필요 시 추가
-                                                    lectureId,
-                                                    userId
-                                            );
-                                            takePost.setStudentId(studentId);
-                                            takePost.setStudentReasons(reason);
-                                            takeList.add(takePost);
+                        if(schedule != null && schedule.contains(todayWeekday)) {
+                            String profId = (currentSelectedPost != null) ? currentSelectedPost.getProfId() : "";
+                            TakePost takePost = new TakePost(subject, " ", classroom, schedule, "", doc.getId(), profId);
+                            takeList.add(takePost);
+                            db.collection("users")
+                                    .document(userId)
+                                    .collection("lecture")
+                                    .document(doc.getId())
+                                    .collection("date")
+                                    .document(dateId)
+                                    .collection("attendance")
+                                    .get()
+                                    .addOnSuccessListener(studentSnapshots -> {
+                                        for (QueryDocumentSnapshot studentDoc : studentSnapshots) {
+                                            String studentId = studentDoc.getId();
+                                            String reason = studentDoc.getString("reason");
+                                            if (reason != null && !reason.isEmpty()) {
+                                                TakePost reasonPost = new TakePost(
+                                                        subject,
+                                                        " ",  // 교수 이름 필요 시 수정
+                                                        classroom,
+                                                        schedule,
+                                                        "", // attendenceStandard 필요 시 추가
+                                                        doc.getId(),
+                                                        userId
+                                                );
+                                                reasonPost.setStudentId(studentId);
+                                                reasonPost.setStudentReasons(reason);
+                                                takeList.add(reasonPost);
+                                            }
                                         }
-                                    }
-                                    adapter.notifyDataSetChanged();
-                                });
+                                        adapter.notifyDataSetChanged();
+                                    });
+                        }
                     }
-                    adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e -> Log.e("Attendence", "교수 데이터 불러오기 실패: ", e));
+
     }
 
     @Override
