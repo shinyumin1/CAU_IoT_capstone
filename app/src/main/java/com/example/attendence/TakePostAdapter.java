@@ -242,14 +242,14 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 holder.profAttendSpinner.setAdapter(spinnerAdapter);
                 //리스너제거
-                holder.profAttendSpinner.setOnClickListener(null);
+                holder.profAttendSpinner.setOnClickListener(null);*/
                 holder.itemView.setOnClickListener(v ->  {
                     if(holder.reasonText.getVisibility()  ==  View.GONE) {
                         holder.reasonText.setVisibility(View.VISIBLE);
                     } else {
                         holder.reasonText.setVisibility(View.GONE);
                     }
-                });
+                });/*
                 //현재 DB값과 일치하는 위치 선택
                 if (post.getAttendenceStandard() != null) {
                     int pos = spinnerAdapter.getPosition(post.getAttendenceStandard());
