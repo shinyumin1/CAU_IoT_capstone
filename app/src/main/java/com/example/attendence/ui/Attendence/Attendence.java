@@ -224,7 +224,7 @@ public class Attendence extends Fragment {
 
     private void loadStudentAttendence(String userId, String dateId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String todayWeekday = new  SimpleDateFormat("E", Locale.KOREAN).format(new Date());
+
         db.collection("users")
                 .document(userId)
                 .collection("takes")
@@ -241,38 +241,35 @@ public class Attendence extends Fragment {
                         TakePost takePost = new TakePost(subject, professor, classroom, schedule, "", doc.getId(), doc.getString("professorId"));
                         takeList.add(takePost);
                         int position = takeList.size() - 1; // 현재 아이템 위치
-                        if(schedule != null && schedule.contains(todayWeekday)) {
 
-                            // Firestore에서 학생 출결 상태 가져오기
-                            db.collection("users")
-                                    .document(userId)
-                                    .collection("takes")
-                                    .document(doc.getId())
-                                    .collection("date")
-                                    .document(dateId)
-                                    .get()
-                                    .addOnSuccessListener(dateDoc -> {
-                                        String status = "미기록";
-                                        if (dateDoc.exists()) {
-                                            String dbStatus = dateDoc.getString("status");
-                                            if (dbStatus != null && !dbStatus.isEmpty()) {
-                                                status = dbStatus;
-                                            }
+                        // Firestore에서 학생 출결 상태 가져오기
+                        db.collection("users")
+                                .document(userId)
+                                .collection("takes")
+                                .document(doc.getId())
+                                .collection("date")
+                                .document(dateId)
+                                .get()
+                                .addOnSuccessListener(dateDoc -> {
+                                    String status = "미기록";
+                                    if (dateDoc.exists()) {
+                                        String dbStatus = dateDoc.getString("status");
+                                        if (dbStatus != null && !dbStatus.isEmpty()) {
+                                            status = dbStatus;
                                         }
-                                        // TakePost에 상태 반영
-                                        takePost.setStudentAttendenceStatus(status);
-                                        // 현재 시간도 반영
-                                        takePost.setCurrentTime(new SimpleDateFormat("HH:mm", Locale.KOREAN).format(new Date()));
-                                        // 해당 아이템만 갱신
-                                        adapter.notifyItemChanged(position);
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        takePost.setStudentAttendenceStatus("불러오기 실패");
-                                        takePost.setCurrentTime(new SimpleDateFormat("HH:mm", Locale.KOREAN).format(new Date()));
-                                        adapter.notifyItemChanged(position);
-                                    });
-                        }
-
+                                    }
+                                    // TakePost에 상태 반영
+                                    takePost.setStudentAttendenceStatus(status);
+                                    // 현재 시간도 반영
+                                    takePost.setCurrentTime(new SimpleDateFormat("HH:mm", Locale.KOREAN).format(new Date()));
+                                    // 해당 아이템만 갱신
+                                    adapter.notifyItemChanged(position);
+                                })
+                                .addOnFailureListener(e -> {
+                                    takePost.setStudentAttendenceStatus("불러오기 실패");
+                                    takePost.setCurrentTime(new SimpleDateFormat("HH:mm", Locale.KOREAN).format(new Date()));
+                                    adapter.notifyItemChanged(position);
+                                });
                     }
                 })
                 .addOnFailureListener(e -> Log.e("Attendence", "학생 데이터 불러오기 실패: ", e));
