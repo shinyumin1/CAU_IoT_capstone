@@ -198,6 +198,11 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
             }
 
         } else {
+            //교수님
+            /*
+            *
+            *
+            * */
             holder.btnSelectSeat.setVisibility(View.GONE);
             holder.btnStudAttend.setVisibility(View.GONE);
 
@@ -216,9 +221,12 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                     context.startActivity(intent);
                 });
             } else if ("ATTEND".equals(currentPage)) {
+                /*
                 holder.btnSeatStatus.setVisibility(View.GONE);
-                holder.profAttendSpinner.setVisibility(View.VISIBLE);
+                //holder.profAttendSpinner.setVisibility(View.VISIBLE);
                 holder.standSpinner.setVisibility(View.GONE);
+
+
                 //spinner 세팅
                 ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
                         context,
@@ -274,6 +282,9 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                     public void onNothingSelected(AdapterView<?> parent) {
                     }
                 });
+
+                * **/
+
             }else {
                 holder.btnSeatStatus.setVisibility(View.GONE);
                 holder.standSpinner.setVisibility(View.VISIBLE);
