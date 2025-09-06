@@ -289,37 +289,64 @@ public class Attendence extends Fragment {
         String studentId = getUserIdFromPrefs();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // 학생 DB
         db.collection("users")
                 .document(studentId)
                 .collection("takes")
                 .document(currentSelectedPost.getId())
                 .collection("date")
                 .document(dateId)
-                .set(new HashMap<String, Object>() {{
-                    put("reason", appealText);
-                }}, SetOptions.merge())
-                .addOnSuccessListener(aVoid -> Toast.makeText(getContext(), "이의신청이 제출되었습니다.", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "제출 실패", Toast.LENGTH_SHORT).show());
+                .get()
+                .addOnSuccessListener(dateDoc -> {
+                    final String finalStudentStatus;
+                    if (dateDoc.exists()) {
+                        String dbStatus = dateDoc.getString("status");
+                        finalStudentStatus = (dbStatus != null && !dbStatus.isEmpty()) ? dbStatus : "미기록";
+                    } else {
+                        finalStudentStatus = "미기록";
+                    }
 
-        // 교수 DB
-        String profId = currentSelectedPost.getProfId();
-        if (profId != null && !profId.isEmpty()) {
-            db.collection("users")
-                    .document(profId)
-                    .collection("lecture")
-                    .document(currentSelectedPost.getId())
-                    .collection("date")
-                    .document(dateId)
-                    .collection("attendance")
-                    .document(studentId)
-                    .set(new HashMap<String, Object>() {{
-                        put("reason", appealText);
-                        put("status", "appeal");
-                    }}, SetOptions.merge())
-                    .addOnSuccessListener(aVoid -> Log.d("Submit", "Professor DB updated"))
-                    .addOnFailureListener(e -> Log.e("Submit", "Professor DB failed", e));
-        }
+                    // 학생 DB 업데이트
+                    HashMap<String, Object> studentData = new HashMap<>();
+                    studentData.put("reason", appealText);
+                    studentData.put("status", finalStudentStatus);
+
+                    db.collection("users")
+                            .document(studentId)
+                            .collection("takes")
+                            .document(currentSelectedPost.getId())
+                            .collection("date")
+                            .document(dateId)
+                            .set(studentData, SetOptions.merge())
+                            .addOnSuccessListener(aVoid ->
+                                    Toast.makeText(getContext(), "이의신청이 제출되었습니다.", Toast.LENGTH_SHORT).show()
+                            )
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(getContext(), "제출 실패", Toast.LENGTH_SHORT).show()
+                            );
+                    // 교수 DB
+                    String profId = currentSelectedPost.getProfId();
+                    if (profId != null && !profId.isEmpty()) {
+                        HashMap<String, Object> profData = new HashMap<>();
+                        profData.put("reason", appealText);
+                        profData.put("status", finalStudentStatus);
+
+                        db.collection("users")
+                                .document(profId)
+                                .collection("lecture")
+                                .document(currentSelectedPost.getId())
+                                .collection("date")
+                                .document(dateId)
+                                .collection("attendance")
+                                .document(studentId)
+                                .set(profData, SetOptions.merge())
+                                .addOnSuccessListener(aVoid -> Log.d("Submit", "Professor DB updated"))
+                                .addOnFailureListener(e -> Log.e("Submit", "Professor DB failed", e));
+                    }
+
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "학생 상태 가져오기 실패", Toast.LENGTH_SHORT).show()
+                );
     }
     /**
      * private void loadProfessorAttendence(String userId, String dateId) {
