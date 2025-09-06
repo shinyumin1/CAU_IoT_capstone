@@ -114,11 +114,15 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
         String studentId = post.getStudentId();
         String reason = post.getStudentReasons();
 
-        if (reason != null && !reason.isEmpty()) {
-            holder.reasonText.setText(studentId + " : " + reason);
+        if (studentId != null) {
+            if (reason != null && !reason.isEmpty()) {
+                holder.reasonText.setText("      " + studentId + " : " + reason);
+            } else {
+                holder.reasonText.setText("      " + studentId + " : 사유 없음");
+            }
+            holder.reasonText.setVisibility(View.VISIBLE);
         } else {
-            holder.reasonText.setText("사유 없음");
-
+            holder.reasonText.setVisibility(View.GONE);
         }
 
         if (!showButtons) {
