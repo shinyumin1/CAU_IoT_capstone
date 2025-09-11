@@ -37,6 +37,7 @@ public class Attendence extends Fragment {
     private TakePost currentSelectedPost;
     private String selectedDateId = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
     private String userId;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -56,7 +57,6 @@ public class Attendence extends Fragment {
         adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
         adapter.setUserId(userId);
         recyclerView.setAdapter(adapter);
-
 
 
         // 달력 버튼
@@ -94,7 +94,6 @@ public class Attendence extends Fragment {
     }
 
 
-
     private void setupStudentUI() {
         adapter = new TakePostAdapter(getContext(), takeList, true, "ATTEND");
         recyclerView.setAdapter(adapter);
@@ -128,12 +127,19 @@ public class Attendence extends Fragment {
         binding.attendenceCheckS.setVisibility(View.GONE);
         adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
         recyclerView.setAdapter(adapter);
+        binding.studentStatusButton.setOnClickListener(v -> markAttendancePresent());
+
+        adapter.setOnProfessorStudentClickListener(post -> {
+            currentSelectedPost = post;
+            Toast.makeText(getContext(), post.getStudentId() + " 학생 선택됨", Toast.LENGTH_SHORT).show();
+        });
 
         // 교수용 데이터
         loadProfessorAttendence(userId, selectedDateId);
 
         // 학생 출결 사유 보기 클릭 리스너
         adapter.serOnProfessorClickListener(post -> {
+            currentSelectedPost = post;
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             db.collection("users")
                     .document(userId)
@@ -215,6 +221,7 @@ public class Attendence extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE);
         return prefs.getString("userId", "");
     }
+
     private void loadStudentAttendence(String userId, String dateId) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -240,7 +247,7 @@ public class Attendence extends Fragment {
                         String classroom = doc.getString("강의실");
                         String schedule = doc.getString("시간");
 
-                        if(schedule == null) continue;
+                        if (schedule == null) continue;
 
                         // schedule에서 요일만 추출
                         String scheduleDay = schedule.split("\\(")[0].trim();
@@ -301,124 +308,181 @@ public class Attendence extends Fragment {
                     String userName = userDoc.getString("userName");
 
                     db.collection("users")
-                    .document(studentId)
-                    .collection("takes")
-                    .document(currentSelectedPost.getId())
-                    .collection("date")
-                    .document(dateId)
-                    .get()
-                    .addOnSuccessListener(dateDoc -> {
-                        final String finalStudentStatus;
-                        if (dateDoc.exists()) {
-                            String dbStatus = dateDoc.getString("status");
-                            finalStudentStatus = (dbStatus != null && !dbStatus.isEmpty()) ? dbStatus : "미기록";
-                        } else {
-                            finalStudentStatus = "미기록";
-                        }
+                            .document(studentId)
+                            .collection("takes")
+                            .document(currentSelectedPost.getId())
+                            .collection("date")
+                            .document(dateId)
+                            .get()
+                            .addOnSuccessListener(dateDoc -> {
+                                final String finalStudentStatus;
+                                if (dateDoc.exists()) {
+                                    String dbStatus = dateDoc.getString("status");
+                                    finalStudentStatus = (dbStatus != null && !dbStatus.isEmpty()) ? dbStatus : "미기록";
+                                } else {
+                                    finalStudentStatus = "미기록";
+                                }
 
-                        // 학생 DB 업데이트
-                        HashMap<String, Object> studentData = new HashMap<>();
-                        studentData.put("name",userName);
-                        studentData.put("reason", appealText);
-                        studentData.put("status", finalStudentStatus);
+                                // 학생 DB 업데이트
+                                HashMap<String, Object> studentData = new HashMap<>();
+                                studentData.put("name", userName);
+                                studentData.put("reason", appealText);
+                                studentData.put("status", finalStudentStatus);
 
-                        db.collection("users")
-                                .document(studentId)
-                                .collection("takes")
-                                .document(currentSelectedPost.getId())
-                                .collection("date")
-                                .document(dateId)
-                                .set(studentData, SetOptions.merge())
-                                .addOnSuccessListener(aVoid ->
-                                        Toast.makeText(getContext(), "이의신청이 제출되었습니다.", Toast.LENGTH_SHORT).show()
-                                )
-                                .addOnFailureListener(e ->
-                                        Toast.makeText(getContext(), "제출 실패", Toast.LENGTH_SHORT).show()
-                                );
-                        // 교수 DB
-                        String profId = currentSelectedPost.getProfId();
-                        if (profId != null && !profId.isEmpty()) {
-                            HashMap<String, Object> profData = new HashMap<>();
-                            profData.put("name",userName);
-                            profData.put("reason", appealText);
-                            profData.put("status", finalStudentStatus);
+                                db.collection("users")
+                                        .document(studentId)
+                                        .collection("takes")
+                                        .document(currentSelectedPost.getId())
+                                        .collection("date")
+                                        .document(dateId)
+                                        .set(studentData, SetOptions.merge())
+                                        .addOnSuccessListener(aVoid ->
+                                                Toast.makeText(getContext(), "이의신청이 제출되었습니다.", Toast.LENGTH_SHORT).show()
+                                        )
+                                        .addOnFailureListener(e ->
+                                                Toast.makeText(getContext(), "제출 실패", Toast.LENGTH_SHORT).show()
+                                        );
+                                // 교수 DB
+                                String profId = currentSelectedPost.getProfId();
+                                if (profId != null && !profId.isEmpty()) {
+                                    HashMap<String, Object> profData = new HashMap<>();
+                                    profData.put("name", userName);
+                                    profData.put("reason", appealText);
+                                    profData.put("status", finalStudentStatus);
 
-                            db.collection("users")
-                                    .document(profId)
-                                    .collection("lecture")
-                                    .document(currentSelectedPost.getId())
-                                    .collection("date")
-                                    .document(dateId)
-                                    .collection("attendance")
-                                    .document(studentId)
-                                    .set(profData, SetOptions.merge())
-                                    .addOnSuccessListener(aVoid -> Log.d("Submit", "Professor DB updated"))
-                                    .addOnFailureListener(e -> Log.e("Submit", "Professor DB failed", e));
-                        }
+                                    db.collection("users")
+                                            .document(profId)
+                                            .collection("lecture")
+                                            .document(currentSelectedPost.getId())
+                                            .collection("date")
+                                            .document(dateId)
+                                            .collection("attendance")
+                                            .document(studentId)
+                                            .set(profData, SetOptions.merge())
+                                            .addOnSuccessListener(aVoid -> Log.d("Submit", "Professor DB updated"))
+                                            .addOnFailureListener(e -> Log.e("Submit", "Professor DB failed", e));
+                                }
 
-                    })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(getContext(), "학생 상태 가져오기 실패", Toast.LENGTH_SHORT).show()
-                    );
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(getContext(), "학생 상태 가져오기 실패", Toast.LENGTH_SHORT).show()
+                            );
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(), "사용자 정보 가져오기 실패", Toast.LENGTH_SHORT).show()
                 );
     }
 
-        private void loadProfessorAttendence(String userId, String dateId) {
-            String todayWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(new Date());
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private void loadProfessorAttendence(String userId, String dateId) {
+        String todayWeekday = new SimpleDateFormat("E", Locale.KOREAN).format(new Date());
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            db.collection("users")
-                    .document(userId)
-                    .collection("lecture")
-                    .get()
-                    .addOnSuccessListener(queryDocumentSnapshots -> {
-                        takeList.clear();
-                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                            String subject = doc.getString("과목명");
-                            String classroom = doc.getString("강의실");
-                            String schedule = doc.getString("시간");
+        db.collection("users")
+                .document(userId)
+                .collection("lecture")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    takeList.clear();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        String subject = doc.getString("과목명");
+                        String classroom = doc.getString("강의실");
+                        String schedule = doc.getString("시간");
 
-                            if (schedule != null && schedule.contains(todayWeekday)) {
-                                String profId = doc.getString("professorId");
-                                TakePost takePost = new TakePost(subject, " ", classroom, schedule, "", doc.getId(), profId);
-                                takeList.add(takePost);
+                        if (schedule != null && schedule.contains(todayWeekday)) {
+                            String profId = doc.getString("professorId");
+                            TakePost takePost = new TakePost(subject, " ", classroom, schedule, "", doc.getId(), profId);
+                            takeList.add(takePost);
 
-                                db.collection("users")
-                                        .document(userId)
-                                        .collection("lecture")
-                                        .document(doc.getId())
-                                        .collection("date")
-                                        .document(dateId)
-                                        .collection("attendance")
-                                        .get()
-                                        .addOnSuccessListener(studentSnapshots -> {
-                                            for (QueryDocumentSnapshot studentDoc : studentSnapshots) {
-                                                String studentId = studentDoc.getId();
-                                                String reason = studentDoc.getString("reason");
-                                                if (reason != null && !reason.isEmpty()) {
-                                                    TakePost reasonPost = new TakePost(
-                                                            subject,
-                                                            " ",  // 필요 시 교수 이름 넣기
-                                                            classroom,
-                                                            schedule,
-                                                            "", // 필요 시 attendenceStandard 추가
-                                                            doc.getId(),
-                                                            profId
-                                                    );
-                                                    reasonPost.setStudentId(studentId);
-                                                    reasonPost.setStudentReasons(reason);
-                                                    takeList.add(reasonPost);
-                                                }
+                            db.collection("users")
+                                    .document(userId)
+                                    .collection("lecture")
+                                    .document(doc.getId())
+                                    .collection("date")
+                                    .document(dateId)
+                                    .collection("attendance")
+                                    .get()
+                                    .addOnSuccessListener(studentSnapshots -> {
+                                        for (QueryDocumentSnapshot studentDoc : studentSnapshots) {
+                                            String studentId = studentDoc.getId();
+                                            String reason = studentDoc.getString("reason");
+                                            if (reason != null && !reason.isEmpty()) {
+                                                TakePost reasonPost = new TakePost(
+                                                        subject,
+                                                        " ",  // 필요 시 교수 이름 넣기
+                                                        classroom,
+                                                        schedule,
+                                                        "", // 필요 시 attendenceStandard 추가
+                                                        doc.getId(),
+                                                        profId
+                                                );
+                                                reasonPost.setStudentId(studentId);
+                                                reasonPost.setStudentReasons(reason);
+                                                takeList.add(reasonPost);
                                             }
-                                            adapter.notifyDataSetChanged();
-                                        });
-                            }
+                                        }
+                                        adapter.notifyDataSetChanged();
+                                    });
                         }
-                    })
-                    .addOnFailureListener(e -> Log.e("Attendence", "교수 데이터 불러오기 실패: ", e));
+                    }
+                })
+                .addOnFailureListener(e -> Log.e("Attendence", "교수 데이터 불러오기 실패: ", e));
+    }
+
+    private void markAttendancePresent() {
+        if (currentSelectedPost == null) {
+            Toast.makeText(getContext(), "먼저 학생을 선택하세요.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String studentId = currentSelectedPost.getStudentId(); // 학생 ID
+        String takeId = currentSelectedPost.getId(); // 과목 ID
+        String dateId = selectedDateId; // 선택 날짜
+        String profId = currentSelectedPost.getProfId(); // 교수 ID
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        HashMap<String, Object> studentData = new HashMap<>();
+        studentData.put("status", "출석");
+
+        db.collection("users")
+                .document(profId)
+                .collection("lecture")
+                .document(takeId)
+                .collection("date")
+                .document(dateId)
+                .set(studentData, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> {
+                    // 2. 교수 DB 업데이트
+                    if (profId != null && !profId.isEmpty()) {
+                        HashMap<String, Object> profData = new HashMap<>();
+                        profData.put("status", "출석");
+
+                        db.collection("users")
+                                .document(profId)
+                                .collection("lecture")
+                                .document(takeId)
+                                .collection("date")
+                                .document(dateId)
+                                .collection("attendance")
+                                .document(studentId)
+                                .set(profData, SetOptions.merge())
+                                .addOnSuccessListener(aVoid1 -> {
+                                    // 3. UI 갱신
+                                    currentSelectedPost.setStudentAttendenceStatus("출석");
+                                    int position = takeList.indexOf(currentSelectedPost);
+                                    if (position != -1) {
+                                        adapter.notifyItemChanged(position);
+                                    }
+                                    Toast.makeText(getContext(), "출결 상태가 '출석'으로 변경되었습니다.", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e ->
+                                        Toast.makeText(getContext(), "교수 DB 업데이트 실패: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                                );
+                    }
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "학생 DB 업데이트 실패: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
         }
 
 

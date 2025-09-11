@@ -35,6 +35,14 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     private String currentPage;
     private String selectedDateId;
     private String userId;
+    private int selectedPosition = RecyclerView.NO_POSITION;
+    private OnProfessorStudentClickListener profStudentClickListener;
+
+    public void setOnProfessorStudentClickListener(OnProfessorStudentClickListener listener){
+        this.profStudentClickListener = listener;
+    }
+
+
 
     public interface OnSpinnerItemSelectedListener {
         void onItemSelected(TakePost post, String selectedStandard);
@@ -96,6 +104,12 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
         }
     }
 
+    public interface OnProfessorStudentClickListener {
+        void onClick(TakePost post);
+    }
+
+
+
 
     @NonNull
     @Override
@@ -106,10 +120,17 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         TakePost post = takeList.get(position);
+
         holder.subject.setText(post.getSubject());
         holder.professor.setText(post.getProfessor());
         holder.classroom.setText(post.getClassroom());
         holder.schedule.setText(post.getSchedule());
+
+        holder.itemView.setBackgroundResource(R.drawable.bg_item_default);
+
+        if (position==selectedPosition){
+            holder.itemView.setBackgroundResource(R.drawable.bg_item_selected);
+        }
         //학생별 사유
         String studentId = post.getStudentId();
         String reason = post.getStudentReasons();
@@ -231,6 +252,71 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                     context.startActivity(intent);
                 });
             } else if ("ATTEND".equals(currentPage)) {
+                holder.btnSeatStatus.setVisibility(View.GONE);
+                holder.standSpinner.setVisibility(View.GONE);
+
+                holder.reasonText.setVisibility(position == selectedPosition ? View.VISIBLE : View.GONE);
+                holder.itemView.setBackgroundResource(position == selectedPosition ?
+                        R.drawable.bg_item_selected : R.drawable.bg_item_default);
+
+                if (post.getStudentId() != null) {
+                    holder.itemView.setOnClickListener(v -> {
+                        int prevPosition = selectedPosition;
+                        selectedPosition = holder.getAdapterPosition();
+                        notifyItemChanged(prevPosition);
+                        notifyItemChanged(selectedPosition);
+
+                        if (profStudentClickListener != null) {
+                            profStudentClickListener.onClick(post);
+                        }
+
+                        String takeId = post.getId();
+                        String profId = post.getProfId();
+
+                        if (selectedDateId != null && studentId != null && profId != null) {
+                            FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                            // 학생 DB 업데이트
+                            db.collection("users")
+                                    .document(studentId)
+                                    .collection("takes")
+                                    .document(takeId)
+                                    .collection("date")
+                                    .document(selectedDateId)
+                                    .update("status", "출석")
+                                    .addOnSuccessListener(aVoid -> {
+                                        // UI 업데이트
+                                        post.setStudentAttendenceStatus("출석");
+                                        notifyItemChanged(selectedPosition);
+                                        Toast.makeText(context, studentId + " 학생 출석 처리됨", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(context, "출석 처리 실패: " + studentId, Toast.LENGTH_SHORT).show();
+                                        // 실패 시 UI 롤백
+                                        post.setStudentAttendenceStatus(null);
+                                        notifyItemChanged(selectedPosition);
+                                    });
+
+                            // 교수 DB 업데이트
+                            db.collection("users")
+                                    .document(profId)
+                                    .collection("lecture")
+                                    .document(takeId)
+                                    .collection("date")
+                                    .document(selectedDateId)
+                                    .collection("attendance")
+                                    .document(studentId)
+                                    .update("status", "출석")
+                                    .addOnFailureListener(e -> Log.w("TakePostAdapter", "교수 DB 출석 업데이트 실패", e));
+                        }
+                    });
+                } else {
+                    holder.itemView.setOnClickListener(null);
+                }
+
+//                    if (professorClickListener != null){
+//                        professorClickListener.onProfClick(post);
+//                    }
                 /*
                 holder.btnSeatStatus.setVisibility(View.GONE);
                 //holder.profAttendSpinner.setVisibility(View.VISIBLE);
@@ -247,13 +333,21 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 holder.profAttendSpinner.setAdapter(spinnerAdapter);
                 //리스너제거
                 holder.profAttendSpinner.setOnClickListener(null);*/
-                holder.itemView.setOnClickListener(v ->  {
-                    if(holder.reasonText.getVisibility()  ==  View.GONE) {
-                        holder.reasonText.setVisibility(View.VISIBLE);
-                    } else {
-                        holder.reasonText.setVisibility(View.GONE);
-                    }
-                });/*
+
+//                holder.itemView.setOnClickListener(v ->  {
+//                    if(holder.reasonText.getVisibility()  ==  View.GONE) {
+//                        holder.reasonText.setVisibility(View.VISIBLE);
+//                    } else {
+//                        holder.reasonText.setVisibility(View.GONE);
+//                    }
+//                });
+
+                if (position == selectedPosition) {
+                    holder.itemView.setBackgroundResource(R.drawable.bg_item_selected);
+                } else {
+                    holder.itemView.setBackgroundResource(R.drawable.bg_item_default);
+                }
+                /*
                 //현재 DB값과 일치하는 위치 선택
                 if (post.getAttendenceStandard() != null) {
                     int pos = spinnerAdapter.getPosition(post.getAttendenceStandard());

@@ -11,7 +11,7 @@
         <item>결석</item>
         <item>출석</item>
     </string-array>
-    <string name="ex_reason">사유: 출석 후 장염에 걸려서
+    <string name="ex_reason">      20220987 : 출석 후 장염에 걸려서
     11분 동안  화장실에 다녀왔는데 지각 처리가 되었습니다.
     확인부탁드립니다.</string>
 
