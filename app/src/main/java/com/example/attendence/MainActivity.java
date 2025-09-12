@@ -71,44 +71,42 @@ public class MainActivity extends AppCompatActivity {
     int pairedDeviceCount;
 
     public void selectBluetoothDevice() {
-        // 🔹 권한 체크 (Android 12 이상 필요)
+        // 권한 체크 (Android 12 이상 필요)
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 100);
             return; // 권한 없으면 아래 코드 실행하지 않음
         }
+
         devices = bluetoothAdapter.getBondedDevices();
         pairedDeviceCount = devices.size();
-        if(pairedDeviceCount==0 ){
-            Toast.makeText(getApplicationContext(),"먼저 페어링 해주세요",Toast.LENGTH_SHORT).show();
+
+        if (pairedDeviceCount == 0) {
+            Toast.makeText(getApplicationContext(), "먼저 페어링 해주세요", Toast.LENGTH_SHORT).show();
         } else {
-            AlertDialog.Builder builder= new AlertDialog.Builder(this);
-            builder.setTitle("페이링 된 블루투스 디바이스 목록");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("페어링 된 블루투스 디바이스 목록");
 
             List<String> list = new ArrayList<>();
-            for (BluetoothDevice bluetoothDevice : devices){
+            for (BluetoothDevice bluetoothDevice : devices) {
                 list.add(bluetoothDevice.getName());
             }
             list.add("취소");
 
-            final CharSequence[] charSequences = list.toArray(new CharSequence[list.size()]);
-            list.toArray(new CharSequence[list.size()]);
+            final CharSequence[] charSequences = list.toArray(new CharSequence[0]);
 
-            builder.setItems(charSequences, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog,int which) {
+            builder.setItems(charSequences, (dialog, which) -> {
+                if (!charSequences[which].equals("취소")) {
                     connectDevice(charSequences[which].toString());
                 }
             });
-            builder.setCancelable(false);
+            builder.setCancelable(true);
             AlertDialog alterDialog = builder.create();
             alterDialog.show();
         }
-
     }
-    public void connectDevice(String deviceName){
-        // 권한 체크
+    public void connectDevice(String deviceName) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -117,73 +115,99 @@ public class MainActivity extends AppCompatActivity {
         }
 
         BluetoothDevice selectedDevice = null;
-        for (BluetoothDevice bluetoothDevice : devices){
-            if (deviceName.equals(bluetoothDevice.getName())){
-                selectedDevice = bluetoothDevice;
+        for (BluetoothDevice device : devices) {
+            if (deviceName.equals(device.getName())) {
+                selectedDevice = device;
                 break;
             }
         }
-        Toast.makeText(getApplicationContext(), bluetoothDevice.getName() +"연결완료", Toast.LENGTH_SHORT).show();
-        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
+
+        if (selectedDevice == null) {
+            Toast.makeText(this, "선택한 디바이스를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(getApplicationContext(),
+                selectedDevice.getName() + " 연결 시도중...", Toast.LENGTH_SHORT).show();
+
+        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // SPP UUID
+
         try {
-            bluetoothSocket = bluetoothSocket.getRemoteDevice().createRfcommSocketToServiceRecord(uuid);
+            bluetoothSocket = selectedDevice.createRfcommSocketToServiceRecord(uuid);
             bluetoothSocket.connect();
 
             outputStream =bluetoothSocket.getOutputStream();
             inputStream = bluetoothSocket.getInputStream();
+
+            Toast.makeText(getApplicationContext(),
+                    selectedDevice.getName() + " 연결 완료", Toast.LENGTH_SHORT).show();
+
             receiveData();
+
         } catch (IOException e){
             e.printStackTrace();
+            Toast.makeText(getApplicationContext(),
+                    "연결 실패: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
     public void receiveData(){
         final Handler handler = new Handler();
         readBufferPosition  = 0;
         readBuffer = new byte[1024];
-        workerThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(!Thread.currentThread().isInterrupted()) {
-                    try {
-                        int byteAvailable = inputStream.available();
-                        if (byteAvailable > 0) {
-                            byte[] bytes = new byte[byteAvailable];
-                            inputStream.read(bytes);
 
-                            for(int i=0 ;i < byteAvailable; i++){
-                                byte tempByte = bytes[i];
-                                if(tempByte == '\n'){
-                                    byte[] encodeBytes = new byte[readBufferPosition];
-                                    System.arraycopy(readBuffer,0,encodeBytes, 0,encodeBytes.length);
+        workerThread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    int byteAvailable = inputStream.available();
+                    if (byteAvailable > 0) {
+                        byte[] bytes = new byte[byteAvailable];
+                        inputStream.read(bytes);
 
-                                    final String text = new String(encodeBytes, "UTF-8");
-                                    readBufferPosition = 0;
-                                    handler.post(new Runnable() {
-                                        @Override
-                                        public void run() {
+                        for (int i = 0; i < byteAvailable; i++) {
+                            byte tempByte = bytes[i];
+                            if (tempByte == '\n') {
+                                byte[] encodeBytes = new byte[readBufferPosition];
+                                System.arraycopy(readBuffer, 0, encodeBytes, 0, encodeBytes.length);
 
-                                        }
-                                    });
-                                } else {
-                                    readBuffer[readBufferPosition++] = tempByte;
-                                }
+                                final String text = new String(encodeBytes, "UTF-8");
+                                readBufferPosition = 0;
+
+                                handler.post(() -> {
+                                    // 여기서 UI 업데이트
+                                    Log.d("Bluetooth", "받은 데이터: " + text);
+                                    Toast.makeText(getApplicationContext(),
+                                            "수신: " + text, Toast.LENGTH_SHORT).show();
+
+                                    // 예시: TextView에 표시
+                                    TextView tv = findViewById(R.id.my_name);
+                                    if (tv != null) {
+                                        tv.setText("수신: " + text);
+                                    }
+                                });
+                            } else {
+                                readBuffer[readBufferPosition++] = tempByte;
                             }
                         }
-                    }catch (IOException e){
-                        e.printStackTrace();
                     }
-                }try {
-                  Thread.sleep(1000);
-                } catch (InterruptedException e) {
+
+                    // Sleep while 안으로 이동
+                    Thread.sleep(100);
+
+                } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
+                    break;
                 }
             }
         });
+
         workerThread.start();
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
         //위치권한 허용  코드
         String[] permission_list = {
           Manifest.permission.ACCESS_FINE_LOCATION,
@@ -197,15 +221,14 @@ public class MainActivity extends AppCompatActivity {
         } else {
             //기기가 블루투스를 지원할 시
             if (bluetoothAdapter.isEnabled()) {
-                //selectBluetoothDevice();
+                selectBluetoothDevice();
             } else {
-                //Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 //startActivityForResult(intent, REQUEST_ENABLE_BT);
-                //selectBluetoothDevice();
+                selectBluetoothDevice();
             }
         }
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+
 
         // firebase 초기화
         db = FirebaseFirestore.getInstance();
@@ -260,6 +283,5 @@ public class MainActivity extends AppCompatActivity {
 
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
-
 
 }
