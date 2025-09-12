@@ -97,10 +97,6 @@ public class Attendence extends Fragment {
     private void setupStudentUI() {
         adapter = new TakePostAdapter(getContext(), takeList, true, "ATTEND");
         recyclerView.setAdapter(adapter);
-        binding.attendenceCheckS.setVisibility(View.VISIBLE);
-        binding.attendenceCheckS.setOnClickListener(v ->
-                Toast.makeText(getContext(), "출결 이의 신청 클릭됨", Toast.LENGTH_SHORT).show()
-        );
         adapter.setOnStudentAppealClickListener(post -> {
             binding.studentAppealEditbox.setVisibility(View.VISIBLE);
             binding.studentAppealButton.setVisibility(View.VISIBLE);
@@ -126,7 +122,6 @@ public class Attendence extends Fragment {
     }
 
     private void setupProfessorUI() {
-        binding.attendenceCheckS.setVisibility(View.GONE);
         adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
         recyclerView.setAdapter(adapter);
         binding.studentStatusButton.setOnClickListener(v -> markAttendancePresent());
