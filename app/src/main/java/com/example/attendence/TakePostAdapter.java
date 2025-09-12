@@ -128,6 +128,12 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
 
         holder.itemView.setBackgroundResource(R.drawable.bg_item_default);
 
+        if ("출석".equals(post.getStudentAttendenceStatus())) {
+            holder.itemView.setVisibility(View.GONE);
+            holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
+            return;
+        }
+
         if (position==selectedPosition){
             holder.itemView.setBackgroundResource(R.drawable.bg_item_selected);
         }
