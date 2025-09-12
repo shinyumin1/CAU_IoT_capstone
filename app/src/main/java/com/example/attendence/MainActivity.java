@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private int readBufferPosition;
     String[] array= {"0"};
     int pairedDeviceCount;
+    private TakePostAdapter takePostAdapter;
 
     public void selectBluetoothDevice() {
         // 권한 체크 (Android 12 이상 필요)
@@ -177,6 +178,9 @@ public class MainActivity extends AppCompatActivity {
                                     Log.d("Bluetooth", "받은 데이터: " + text);
                                     Toast.makeText(getApplicationContext(),
                                             "수신: " + text, Toast.LENGTH_SHORT).show();
+                                     if  (takePostAdapter  != null) {
+                                            takePostAdapter.setBluetoothData(text);
+                                     }
 
                                     // 예시: TextView에 표시
                                     //TextView tv = findViewById(R.id.my_name);
@@ -184,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                                     *if (tv != null) {
                                         tv.setText("수신: " + text);
                                     }
-                                    * */
+                                    * *  /
 
                                 });
                             } else {
