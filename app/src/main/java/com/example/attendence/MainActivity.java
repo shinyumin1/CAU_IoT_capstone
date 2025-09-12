@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                                     *if (tv != null) {
                                         tv.setText("수신: " + text);
                                     }
-                                    * *  /
+                                    * */
 
                                 });
                             } else {
