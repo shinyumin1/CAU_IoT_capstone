@@ -37,6 +37,11 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     private String userId;
     private int selectedPosition = RecyclerView.NO_POSITION;
     private OnProfessorStudentClickListener profStudentClickListener;
+    private String bluetoothData;
+    public void setBluetoothData (String data){
+        this.bluetoothData = data;
+        notifyDataSetChanged();
+    }
 
     public void setOnProfessorStudentClickListener(OnProfessorStudentClickListener listener){
         this.profStudentClickListener = listener;
@@ -185,7 +190,10 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 });
             } else if("ATTEND".equals(currentPage)) {
                 holder.btnSelectSeat.setVisibility(View.GONE);
-
+                if(bluetoothData !=null && !bluetoothData.isEmpty()){
+                    holder.btnStudAttend.setVisibility(View.VISIBLE);
+                    holder.btnStudAttend.setText("블루투스 값:" + bluetoothData);
+                }
                 if(post.getStudentAttendenceStatus() != null && !post.getStudentAttendenceStatus().isEmpty()) {
                     holder.btnStudAttend.setVisibility(View.VISIBLE);
                     holder.btnStudAttend.setText(

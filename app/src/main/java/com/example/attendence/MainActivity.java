@@ -179,10 +179,13 @@ public class MainActivity extends AppCompatActivity {
                                             "수신: " + text, Toast.LENGTH_SHORT).show();
 
                                     // 예시: TextView에 표시
-                                    TextView tv = findViewById(R.id.my_name);
-                                    if (tv != null) {
+                                    //TextView tv = findViewById(R.id.my_name);
+                                    /*
+                                    *if (tv != null) {
                                         tv.setText("수신: " + text);
                                     }
+                                    * */
+
                                 });
                             } else {
                                 readBuffer[readBufferPosition++] = tempByte;
