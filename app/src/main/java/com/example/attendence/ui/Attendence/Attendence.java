@@ -452,7 +452,7 @@ public class Attendence extends Fragment {
                 .document(dateId)
                 .set(studentData, SetOptions.merge())
                 .addOnSuccessListener(aVoid -> {
-                    // 2. 교수 DB 업데이트
+                    // 교수 DB 업데이트
                     if (profId != null && !profId.isEmpty()) {
                         HashMap<String, Object> profData = new HashMap<>();
                         profData.put("status", "출석");
@@ -467,7 +467,6 @@ public class Attendence extends Fragment {
                                 .document(studentId)
                                 .set(profData, SetOptions.merge())
                                 .addOnSuccessListener(aVoid1 -> {
-                                    // 3. UI 갱신
                                     currentSelectedPost.setStudentAttendenceStatus("출석");
                                     int position = takeList.indexOf(currentSelectedPost);
                                     if (position != -1) {
@@ -479,6 +478,23 @@ public class Attendence extends Fragment {
                                         Toast.makeText(getContext(), "교수 DB 업데이트 실패: " + e.getMessage(), Toast.LENGTH_SHORT).show()
                                 );
                     }
+
+                    // 학생 DB 반영
+                    db.collection("users")
+                            .document(studentId)
+                            .collection("takes")
+                            .document(takeId)
+                            .collection("date")
+                            .document(dateId)
+                            .update("status", "출석")
+                            .addOnSuccessListener(aVoid1 -> {
+                                Log.d("Firestore", "status가 '출석'으로 변경됨");
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w("Firestore", "status 변경 실패", e);
+                            });
+
+
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(getContext(), "학생 DB 업데이트 실패: " + e.getMessage(), Toast.LENGTH_SHORT).show()
