@@ -117,6 +117,8 @@ public class Attendence extends Fragment {
                 return;
             }
             submitStudentAttendence(appealText, selectedDateId);
+            binding.studentAppealEditbox.setVisibility(View.GONE);
+            binding.studentAppealButton.setVisibility(View.GONE);
         });
 
         // 학생 데이터 불러오기
