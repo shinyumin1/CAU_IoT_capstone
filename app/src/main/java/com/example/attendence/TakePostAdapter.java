@@ -192,17 +192,9 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 holder.btnSelectSeat.setVisibility(View.GONE);
                 if(bluetoothData !=null && !bluetoothData.isEmpty()){
                     holder.btnStudAttend.setVisibility(View.VISIBLE);
-                    holder.btnStudAttend.setText("블루투스 값:" + bluetoothData);
+                    holder.btnStudAttend.setText(bluetoothData);
                 }
-                if(post.getStudentAttendenceStatus() != null && !post.getStudentAttendenceStatus().isEmpty()) {
-                    holder.btnStudAttend.setVisibility(View.VISIBLE);
-                    holder.btnStudAttend.setText(
-                            post.getStudentAttendenceStatus() +
-                                    " \n( " + post.getCurrentTime()+")"
-                    );
-                    //btnStudAttend을클릭하면 사유를 적을 수 있는 칸이랑. 버튼이 나오도록
-
-                } else {
+                else {
                     // Firestore에서 출결 상태 불러오기
                     if(userId != null && !userId.isEmpty()) {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
