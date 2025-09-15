@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,15 +22,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.attendence.MainActivity;
 import com.example.attendence.TakePost;
 import com.example.attendence.TakePostAdapter;
 import com.example.attendence.databinding.FragmentAttendenceBinding;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.j2objc.annotations.OnDealloc;
+
 //해당페이지에서 블루투스 통신으로 데이터 연결
 public class Attendence extends Fragment {
-
+    private AttendenceViewModel attendenceViewModel;
     private FragmentAttendenceBinding binding;
     private RecyclerView recyclerView;
     private TakePostAdapter adapter;
@@ -37,6 +41,7 @@ public class Attendence extends Fragment {
     private TakePost currentSelectedPost;
     private String selectedDateId = new SimpleDateFormat("yyMMdd", Locale.KOREAN).format(new Date());
     private String userId;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -58,7 +63,11 @@ public class Attendence extends Fragment {
         adapter.setUserId(userId);
         recyclerView.setAdapter(adapter);
 
-
+        // viewModel 연결
+        attendenceViewModel = new ViewModelProvider(requireActivity()).get(AttendenceViewModel.class);
+        attendenceViewModel.getBluetoothData().observe(getViewLifecycleOwner(), data -> {
+            adapter.setBluetoothData(data); // 여기서 Adapter 업데이트
+        });
         // 달력 버튼
         binding.calendarButton.setVisibility(View.VISIBLE);
         binding.calendarButton.setOnClickListener(v -> showDatePicker());

@@ -17,12 +17,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.attendence.databinding.FragmentHomeBinding;
+import com.example.attendence.ui.Attendence.AttendenceViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -178,13 +180,19 @@ public class MainActivity extends AppCompatActivity {
                                     Log.d("Bluetooth", "받은 데이터: " + text);
                                     Toast.makeText(getApplicationContext(),
                                             "수신: " + text, Toast.LENGTH_SHORT).show();
+                                    /*attendence에 전달*/
+                                    AttendenceViewModel viewModel = new ViewModelProvider(this).get(AttendenceViewModel.class);
+                                    viewModel.setBluetoothData(text);
+                                    /*
                                      if  (takePostAdapter  != null) {
                                             takePostAdapter.setBluetoothData(text);
+                                     }else {
+                                         Log.d("post?", "받은 데이터: " + takePostAdapter);
                                      }
 
                                     // 예시: TextView에 표시
                                     //TextView tv = findViewById(R.id.my_name);
-                                    /*
+
                                     *if (tv != null) {
                                         tv.setText("수신: " + text);
                                     }
@@ -290,5 +298,6 @@ public class MainActivity extends AppCompatActivity {
 
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
+    /*블루투스로 받은 데이터를 activity랑 fragment와 같은 viewModel을 공유하도록 함*/
 
 }

@@ -37,18 +37,22 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
     private String userId;
     private int selectedPosition = RecyclerView.NO_POSITION;
     private OnProfessorStudentClickListener profStudentClickListener;
-    private String time;
-    private String status;
+    private String bluetoothTime;
+    private String bluetoothStatus;
+    private String bluetoothWeek;
     private String bluetoothData;
     public void setBluetoothData (String data){
-        this.bluetoothData = data;
         if (data == null || data.isEmpty()) return;
         String[] parts = data.split("/");
-        if(parts.length<3) return;
-
-        this.time  = parts[1];
-        this.status = parts[2];
-
+        if(parts.length < 3) return;
+        this.bluetoothWeek = parts[0];
+        this.bluetoothTime = parts[1];
+        this.bluetoothStatus = parts[2];
+        Log.d("TakePostAdapter", "Bluetooth 데이터 수신: time=" + bluetoothTime + ", status=" + bluetoothStatus);
+        for (TakePost post: takeList){
+            post.setCurrentTime(bluetoothTime);
+            post.setStudentAttendenceStatus(bluetoothStatus);
+        }
         notifyDataSetChanged();
     }
 
@@ -199,14 +203,14 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 });
             } else if("ATTEND".equals(currentPage)) {
                 holder.btnSelectSeat.setVisibility(View.GONE);
-                if(bluetoothData !=null && !bluetoothData.isEmpty()){
-                    post.setCurrentTime(time);
-                    post.setStudentAttendenceStatus(status);
+
+                if(post.getStudentAttendenceStatus() != null && !post.getStudentAttendenceStatus().isEmpty()){
                     holder.btnStudAttend.setVisibility(View.VISIBLE);
                     holder.btnStudAttend.setText(
                             post.getStudentAttendenceStatus() +
                                     "\n(" + post.getCurrentTime() + ")");
-                } else {
+                }
+                else {
                     // Firestore에서 출결 상태 불러오기
                     if(userId != null && !userId.isEmpty()) {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
