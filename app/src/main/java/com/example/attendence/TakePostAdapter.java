@@ -203,17 +203,15 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
 
                 if (post.getStudentAttendenceStatus() != null && !post.getStudentAttendenceStatus().isEmpty()) {
                     holder.btnStudAttend.setVisibility(View.VISIBLE);
-
-                    if ("출결 완료".equals(post.getStudentAttendenceStatus())) {
+                    String st = holder.btnStudAttend.getText().toString();
+                    if ("출결 완료".equals(st)) {
                         // 이미 완료된 경우 → 그대로 상태 표시
                         holder.btnStudAttend.setText(post.getStudentAttendenceStatus());
-                    } else if("지각".equals(post.getStudentAttendenceStatus())){
+                    } else if ("지각".equals(st)) {
                         holder.btnStudAttend.setText(post.getStudentAttendenceStatus());
-                    } else{
-                        // 완료가 아닐 경우 → 블루투스에서 받은 데이터로 표시
-                        holder.btnStudAttend.setText(
-                                post.getStudentAttendenceStatus()
-                        );
+                    } else {
+                        // 완료/지각이 아닌 경우 → 블루투스에서 받은 데이터로 표시
+                        holder.btnStudAttend.setText( post.getStudentAttendenceStatus());
                     }
                 }
                 else {
