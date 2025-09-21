@@ -227,20 +227,20 @@ public class MainActivity extends AppCompatActivity {
           Manifest.permission.ACCESS_COARSE_LOCATION
         };
         //블루투스 활성화 코드
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter == null){
-            Toast.makeText(getApplicationContext(), "Bluetooth 미지원 기기입니다.", Toast.LENGTH_SHORT).show();
-            // 처리코드 작성
-        } else {
-            //기기가 블루투스를 지원할 시
-            if (bluetoothAdapter.isEnabled()) {
-                selectBluetoothDevice();
-            } else {
-                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                //startActivityForResult(intent, REQUEST_ENABLE_BT);
-                selectBluetoothDevice();
-            }
-        }
+//        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+//        if (bluetoothAdapter == null){
+//            Toast.makeText(getApplicationContext(), "Bluetooth 미지원 기기입니다.", Toast.LENGTH_SHORT).show();
+//            // 처리코드 작성
+//        } else {
+//            //기기가 블루투스를 지원할 시
+//            if (bluetoothAdapter.isEnabled()) {
+//                selectBluetoothDevice();
+//            } else {
+//                Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//                //startActivityForResult(intent, REQUEST_ENABLE_BT);
+//                selectBluetoothDevice();
+//            }
+//        }
 
 
         // firebase 초기화
@@ -263,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         NavController navController = navHostFragment.getNavController();
+
         if (userId != null) {
             db.collection("users")
                     .document(userId)
@@ -281,6 +282,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 // role에 따라 초기화면 선택
                                 if ("student".equals(role)) {
+                                    initBluetooth();
                                     navController.navigate(R.id.navigation_attendence);
                                 } else if ("professor".equals(role)) {
                                     navController.navigate(R.id.navigation_attendence);
@@ -298,4 +300,26 @@ public class MainActivity extends AppCompatActivity {
     }
     /*블루투스로 받은 데이터를 activity랑 fragment와 같은 viewModel을 공유하도록 함*/
 
+    private void initBluetooth(){
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter==null){
+            Toast.makeText(getApplicationContext(), "Bluetooth 미지원 기기입니다.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.BLUETOOTH_CONNECT},
+                    REQUEST_BLUETOOTH_PERMISSIONS);
+            return;
+        }
+
+        if (bluetoothAdapter.isEnabled()){
+            selectBluetoothDevice();
+        }
+//        else{
+//            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            startActivityForResult(intent, REQUEST_ENABLE_BT);
+//        }
+    }
 }
