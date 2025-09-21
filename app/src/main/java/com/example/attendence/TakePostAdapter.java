@@ -207,8 +207,8 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 if(post.getStudentAttendenceStatus() != null && !post.getStudentAttendenceStatus().isEmpty()){
                     holder.btnStudAttend.setVisibility(View.VISIBLE);
                     holder.btnStudAttend.setText(
-                            post.getStudentAttendenceStatus() +
-                                    "\n(" + post.getCurrentTime() + ")");
+                            post.getStudentAttendenceStatus()
+                    );
                 }
                 else {
                     // Firestore에서 출결 상태 불러오기

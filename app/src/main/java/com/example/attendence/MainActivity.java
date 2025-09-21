@@ -178,8 +178,6 @@ public class MainActivity extends AppCompatActivity {
                                 handler.post(() -> {
                                     // 여기서 UI 업데이트
                                     Log.d("Bluetooth", "받은 데이터: " + text);
-                                    Toast.makeText(getApplicationContext(),
-                                            "수신: " + text, Toast.LENGTH_SHORT).show();
                                     /*attendence에 전달*/
                                     AttendenceViewModel viewModel = new ViewModelProvider(this).get(AttendenceViewModel.class);
                                     viewModel.setBluetoothData(text);
