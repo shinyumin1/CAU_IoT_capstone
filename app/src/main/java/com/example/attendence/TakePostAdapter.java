@@ -126,9 +126,6 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
         void onClick(TakePost post);
     }
 
-
-
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -206,9 +203,11 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
 
                 if(post.getStudentAttendenceStatus() != null && !post.getStudentAttendenceStatus().isEmpty()){
                     holder.btnStudAttend.setVisibility(View.VISIBLE);
-                    holder.btnStudAttend.setText(
-                            post.getStudentAttendenceStatus()
-                    );
+                    if ("미기록".equals(post.getStudentAttendenceStatus())) {
+                        holder.btnStudAttend.setText(
+                                post.getStudentAttendenceStatus()
+                        );
+                    }
                 }
                 else {
                     // Firestore에서 출결 상태 불러오기
