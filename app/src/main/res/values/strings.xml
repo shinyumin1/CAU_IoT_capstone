@@ -17,13 +17,13 @@
 
     <string-array name="standard_spinner">
         <item>출석기준</item>
-        <item>60분</item>
-        <item>50분</item>
-        <item>40분</item>
-        <item>30분</item>
-        <item>20분</item>
-        <item>10분</item>
         <item>0분</item>
+        <item>30분</item>
+        <item>60분</item>
+        <item>90분</item>
+        <item>120분</item>
+        <item>150분</item>
+        <item>180분</item>
     </string-array>
     <!--출석현황 변경spinner item-->
     <string-array name="attend_status_spinner">

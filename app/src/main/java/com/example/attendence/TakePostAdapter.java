@@ -149,7 +149,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
             return;
         }
 
-        if (position==selectedPosition){
+        if (position == selectedPosition) {
             holder.itemView.setBackgroundResource(R.drawable.bg_item_selected);
         }
         //학생별 사유
@@ -198,7 +198,7 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                         context.startActivity(intent);
                     }
                 });
-            } else if("ATTEND".equals(currentPage)) {
+            } else if ("ATTEND".equals(currentPage)) {
                 holder.btnSelectSeat.setVisibility(View.GONE);
 
                 if (post.getStudentAttendenceStatus() != null && !post.getStudentAttendenceStatus().isEmpty()) {
@@ -209,12 +209,11 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                         //holder.btnStudAttend.setText(post.getStudentAttendenceStatus());
                     } else {
                         // 완료/지각이 아닌 경우 → 블루투스에서 받은 데이터로 표시
-                        holder.btnStudAttend.setText( post.getStudentAttendenceStatus());
+                        holder.btnStudAttend.setText(post.getStudentAttendenceStatus());
                     }
-                }
-                else {
+                } else {
                     // Firestore에서 출결 상태 불러오기
-                    if(userId != null && !userId.isEmpty()) {
+                    if (userId != null && !userId.isEmpty()) {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
                         String dateId = (selectedDateId != null) ? selectedDateId
                                 : new java.text.SimpleDateFormat("yyMMdd", java.util.Locale.KOREAN).format(new java.util.Date());
@@ -228,9 +227,9 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                                 .get()
                                 .addOnSuccessListener(document -> {
                                     String status = "미기록";
-                                    if(document.exists()) {
+                                    if (document.exists()) {
                                         String dbStatus = document.getString("status"); // status : 출석/결석/지각 => 출석 미인정은 추후 고려
-                                        if(dbStatus != null && !dbStatus.isEmpty()) {
+                                        if (dbStatus != null && !dbStatus.isEmpty()) {
                                             status = dbStatus;
                                         }
                                     }
@@ -255,9 +254,9 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
         } else {
             //교수님
             /*
-            *
-            *
-            * */
+             *
+             *
+             * */
             holder.btnSelectSeat.setVisibility(View.GONE);
             holder.btnStudAttend.setVisibility(View.GONE);
 
@@ -271,8 +270,8 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                     intent.putExtra("과목명", post.getSubject());
                     intent.putExtra("시간", post.getSchedule());
                     intent.putExtra("강의실", post.getClassroom());
-                    intent.putExtra("professorId",userId);
-                    intent.putExtra("lectureId",post.getId());
+                    intent.putExtra("professorId", userId);
+                    intent.putExtra("lectureId", post.getId());
                     context.startActivity(intent);
                 });
             } else if ("ATTEND".equals(currentPage)) {
@@ -334,89 +333,117 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                                     .addOnFailureListener(e -> Log.w("TakePostAdapter", "교수 DB 출석 업데이트 실패", e));
                         }
                     });
-                } else {
-                    holder.itemView.setOnClickListener(null);
                 }
-
-//                    if (professorClickListener != null){
-//                        professorClickListener.onProfClick(post);
+            }
+//                } else // Info page
+//                {
+//                    holder.itemView.setOnClickListener(null);
+//                    holder.standSpinner.setVisibility(View.VISIBLE);
+//
+//                    ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+//                            context,
+//                            R.array.standard_spinner,   // 출결 인정 시간 배열
+//                            R.layout.spinner_item_custom
+//                    );
+//                    spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//                    holder.standSpinner.setAdapter(spinnerAdapter);
+//
+//                    holder.standSpinner.setOnItemSelectedListener(null);
+//
+//                    holder.standSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//                        @Override
+//                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                            String selected = parent.getItemAtPosition(position).toString();
+//                            if (!selected.equals(post.getAttendenceStandard())) {
+//                                if (spinnerListener != null) {
+//                                    spinnerListener.onItemSelected(post, selected);
+//                                }
+//                            }
+//                        }
+//                        @Override
+//                        public void onNothingSelected(AdapterView<?> parent) { }
+//                    });
+//                }
+//
+////                    if (professorClickListener != null){
+////                        professorClickListener.onProfClick(post);
+////                    }
+//                /*
+//                holder.btnSeatStatus.setVisibility(View.GONE);
+//                //holder.profAttendSpinner.setVisibility(View.VISIBLE);
+//                holder.standSpinner.setVisibility(View.GONE);
+//
+//
+//                //spinner 세팅
+//                ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+//                        context,
+//                        R.array.attend_status_spinner,
+//                        R.layout.spinner_item_custom
+//                );
+//                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//                holder.profAttendSpinner.setAdapter(spinnerAdapter);
+//                //리스너제거
+//                holder.profAttendSpinner.setOnClickListener(null);*/
+//
+////                holder.itemView.setOnClickListener(v ->  {
+////                    if(holder.reasonText.getVisibility()  ==  View.GONE) {
+////                        holder.reasonText.setVisibility(View.VISIBLE);
+////                    } else {
+////                        holder.reasonText.setVisibility(View.GONE);
+////                    }
+////                });
+//
+//                if (position == selectedPosition) {
+//                    holder.itemView.setBackgroundResource(R.drawable.bg_item_selected);
+//                } else {
+//                    holder.itemView.setBackgroundResource(R.drawable.bg_item_default);
+//                }
+//                /*
+//                //현재 DB값과 일치하는 위치 선택
+//                if (post.getAttendenceStandard() != null) {
+//                    int pos = spinnerAdapter.getPosition(post.getAttendenceStandard());
+//                    if (pos >= 0) holder.profAttendSpinner.setSelection(pos);
+//                }
+//                //리스너 다시 등록
+//                holder.profAttendSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//                    @Override
+//                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                        String selected = parent.getItemAtPosition(position).toString();
+//                        if(spinnerListener != null){
+//                            spinnerListener.onItemSelected(post, selected);
+//                        }
+//                        //학생쪽으로 반영할 수있도록
+//                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+//                        String studentId = post.getStudentId();
+//                        String takeId = post.getId();
+//                        if(studentId !=null &&  takeId !=null){
+//                            db.collection("users")
+//                                    .document(studentId)
+//                                    .collection("takes")
+//                                    .document(takeId)
+//                                    .collection("date")
+//                                    .document(selectedDateId)
+//                                    .update("status", selected)
+//                                    .addOnSuccessListener(aVoid->{
+//                                        Log.d("교수님 출결현황","학생 출결 기준 업데이트 성공:" + selected);
+//                                    })
+//                                    .addOnFailureListener(e->{
+//                                        Log.w("교수님 출결 현황", "학생 출결 기준 업데이트 실패" ,e);
+//                                    });
+//                        }
 //                    }
-                /*
-                holder.btnSeatStatus.setVisibility(View.GONE);
-                //holder.profAttendSpinner.setVisibility(View.VISIBLE);
-                holder.standSpinner.setVisibility(View.GONE);
-
-
-                //spinner 세팅
-                ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
-                        context,
-                        R.array.attend_status_spinner,
-                        R.layout.spinner_item_custom
-                );
-                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                holder.profAttendSpinner.setAdapter(spinnerAdapter);
-                //리스너제거
-                holder.profAttendSpinner.setOnClickListener(null);*/
-
-//                holder.itemView.setOnClickListener(v ->  {
-//                    if(holder.reasonText.getVisibility()  ==  View.GONE) {
-//                        holder.reasonText.setVisibility(View.VISIBLE);
-//                    } else {
-//                        holder.reasonText.setVisibility(View.GONE);
+//
+//                    @Override
+//                    public void onNothingSelected(AdapterView<?> parent) {
 //                    }
 //                });
+//
+//                * **/
 
-                if (position == selectedPosition) {
-                    holder.itemView.setBackgroundResource(R.drawable.bg_item_selected);
-                } else {
-                    holder.itemView.setBackgroundResource(R.drawable.bg_item_default);
-                }
-                /*
-                //현재 DB값과 일치하는 위치 선택
-                if (post.getAttendenceStandard() != null) {
-                    int pos = spinnerAdapter.getPosition(post.getAttendenceStandard());
-                    if (pos >= 0) holder.profAttendSpinner.setSelection(pos);
-                }
-                //리스너 다시 등록
-                holder.profAttendSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        String selected = parent.getItemAtPosition(position).toString();
-                        if(spinnerListener != null){
-                            spinnerListener.onItemSelected(post, selected);
-                        }
-                        //학생쪽으로 반영할 수있도록
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        String studentId = post.getStudentId();
-                        String takeId = post.getId();
-                        if(studentId !=null &&  takeId !=null){
-                            db.collection("users")
-                                    .document(studentId)
-                                    .collection("takes")
-                                    .document(takeId)
-                                    .collection("date")
-                                    .document(selectedDateId)
-                                    .update("status", selected)
-                                    .addOnSuccessListener(aVoid->{
-                                        Log.d("교수님 출결현황","학생 출결 기준 업데이트 성공:" + selected);
-                                    })
-                                    .addOnFailureListener(e->{
-                                        Log.w("교수님 출결 현황", "학생 출결 기준 업데이트 실패" ,e);
-                                    });
-                        }
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
-                });
-
-                * **/
-
-            }else {
+            else {
                 holder.btnSeatStatus.setVisibility(View.GONE);
                 holder.standSpinner.setVisibility(View.VISIBLE);
-                //spinner 세팅
+                // 스피너 어댑터
                 ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
                         context,
                         R.array.standard_spinner,
@@ -424,33 +451,41 @@ public class TakePostAdapter extends RecyclerView.Adapter<TakePostAdapter.ViewHo
                 );
                 spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 holder.standSpinner.setAdapter(spinnerAdapter);
-                // 리스너 제거
+
+                // 이벤트 잠시 제거
                 holder.standSpinner.setOnItemSelectedListener(null);
-                //현재 DB 값과 일치하는 위치 선택
+
+                // DB에 저장된 값 있으면 선택되도록 (false-> 이벤트 발생 x)
                 if (post.getAttendenceStandard() != null) {
                     int pos = spinnerAdapter.getPosition(post.getAttendenceStandard());
                     if (pos >= 0) holder.standSpinner.setSelection(pos);
                 }
 
-                // 리스너 다시 등록
+                // 리스너  등록
                 holder.standSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         String selected = parent.getItemAtPosition(position).toString();
-                        if (spinnerListener != null) {
-                            spinnerListener.onItemSelected(post, selected);
-                        }
+                        Log.d("INFO Spinner", "선택됨 " + selected);
 
+                        if (!selected.equals(post.getAttendenceStandard())) {
+                            post.setAttendenceStandard(selected); // 선택값 저장
+                            if (spinnerListener != null) {
+                                spinnerListener.onItemSelected(post, selected);
+                            }
+                        }
                     }
+
 
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
-
                     }
+
                 });
             }
         }
     }
+
     @Override
     public int getItemCount() {
         return takeList.size();

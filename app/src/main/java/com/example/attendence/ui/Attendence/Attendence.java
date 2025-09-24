@@ -88,8 +88,8 @@ public class Attendence extends Fragment {
                             if (binding != null) {
                                 binding.standardAttendence.setVisibility(View.VISIBLE);
                                 binding.studentStatusButton.setVisibility(View.VISIBLE);
+                                setupProfessorUI();
                             }
-                            setupProfessorUI();
                         } else {
                             Log.e("Attendence", "알 수 없는 역할: " + role);
                         }
@@ -131,6 +131,7 @@ public class Attendence extends Fragment {
     }
 
     private void setupProfessorUI() {
+        if (binding == null) return;
         adapter = new TakePostAdapter(getContext(), takeList, false, "ATTEND");
         recyclerView.setAdapter(adapter);
         binding.studentStatusButton.setOnClickListener(v -> markAttendancePresent());
